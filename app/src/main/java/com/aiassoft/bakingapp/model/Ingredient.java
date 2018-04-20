@@ -21,44 +21,44 @@ package com.aiassoft.bakingapp.model;
 import com.aiassoft.bakingapp.MyApp;
 
 /**
- * The Movies List Item Object, holds all the necessary information of a list item
+ * Created by gvryn on 20/04/18.
  */
-public class RecipeListItem {
-    private static final String LOG_TAG = MyApp.APP_TAG + RecipeListItem.class.getSimpleName();
 
-    private int id;
-    private String name;
+public class Ingredient {
+    private static final String LOG_TAG = MyApp.APP_TAG + Recipe.class.getSimpleName();
+
+    private String ingredient;
+    private int quantity;
+    private String measure;
 
     /**
      * No args constructor for use in serialization
      */
-    public RecipeListItem() {
+    public Ingredient() {
     }
 
     /**
      * Constructor to initialize all the class fields from the parameters
-     * @param id         The Recipe Id
-     * @param name The name
+     * @param ingredient The ingredient name
+     * @param quantity   The required quantity
+     * @param measure    The quantity measure
      */
-    public RecipeListItem(int id, int page, String name) {
-        this.id = id;
-        this.name = name;
+    public Ingredient(String ingredient, int quantity, String measure) {
+        this.ingredient = ingredient;
+        this.quantity = quantity;
+        this.measure = measure;
     }
 
-    public int getId() {
-        return id;
-    }
+    public String getIngredient() { return ingredient; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public void setIngredient(String ingredient) { this.ingredient = ingredient; }
 
-    public String getName() {
-        return name;
-    }
+    public int getQuantity() { return quantity; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+
+    public String getMeasure() { return measure; }
+
+    public void setMeasure() { this.measure = measure; }
 
 }

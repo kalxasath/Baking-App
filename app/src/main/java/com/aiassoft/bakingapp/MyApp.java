@@ -33,7 +33,7 @@ public class MyApp extends Application {
     // static resources
     private static MyApp mInstance;
 
-    public static final String APP_TAG = "Backing App: ";
+    public static final String APP_TAG = "Baking_App: ";
 
 
     /**

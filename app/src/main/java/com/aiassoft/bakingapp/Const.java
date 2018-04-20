@@ -18,8 +18,6 @@
 
 package com.aiassoft.bakingapp;
 
-import android.net.Uri;
-
 /*
  * Defining a class of constants to use them from any where
  *
@@ -34,9 +32,14 @@ public class Const {
 
 
     /**
-     * themoviedb.org URI definitions
+     * This ID will be used to identify the Loader responsible for loading our movies list.
      */
-    public static final String THE_RECIPE_LIST_URL = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
+    public static final int RECIPES_LOADER_ID = 0;
+
+    /**
+     * recipes list URI definitions
+     */
+    public static final String RECIPE_LIST_URL = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
 
     /**
      * youtube definitions
