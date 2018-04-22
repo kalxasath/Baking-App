@@ -59,6 +59,6 @@ public class Ingredient {
 
     public String getMeasure() { return measure; }
 
-    public void setMeasure() { this.measure = measure; }
+    public void setMeasure(String measure) { this.measure = measure; }
 
 }

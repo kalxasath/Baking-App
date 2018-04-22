@@ -21,7 +21,9 @@ package com.aiassoft.bakingapp.utilities;
 import android.util.Log;
 
 import com.aiassoft.bakingapp.MyApp;
+import com.aiassoft.bakingapp.model.Ingredient;
 import com.aiassoft.bakingapp.model.Recipe;
+import com.aiassoft.bakingapp.model.Step;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,41 +39,98 @@ public class JsonUtils {
     private static final String LOG_TAG = MyApp.APP_TAG + JsonUtils.class.getSimpleName();
 
     /**
+     *  Dear reviewer kindly I want to inform you that
+     *  in this project I prefer to use native java code
+     *  to get the JSON data.
+     *
+     *  Of course in the previous projects, the reviewers gave me a lot
+     *  of handy hints such as the use of the library GSon.
+     *
+     *  Please feel free to suggest me another library like the GSon
+     *  Thank you
+     */
+
+    /**
      * This method will take a json string as input and use that
-     * json data to build a ArrayList of MoviesListItem objects
-     * @param json The Movies List data in json format as string
-     * @return     The ArrayList of MoviesListItem objects
+     * json data to build a ArrayList of Recipe objects
+     * @param json The recipes data in json format as string
+     * @return     The ArrayList of Recipe objects
      */
     public static List<Recipe> parseRecipesListJson(String json) {
         Log.d(LOG_TAG, json);
 
-        /* ArrayList to hold the movies list items */
-        List<Recipe> recipeListItems = new ArrayList<Recipe>();
+        /** ArrayList to hold the recipes list items */
+        List<Recipe> returnRecipeListItems = new ArrayList<>();
         Recipe recipe;
+
+        /** ArrayList to hold the ingredients list items */
+        List<Ingredient> recipeIngredients;
+        Ingredient ingredient;
+
+        /** ArrayList to hold the steps list items */
+        List<Step> recipeSteps;
+        Step step;
 
         try {
             /** Creates a new JSONObject with name/value mappings from the json string */
-            JSONObject moviesData = new JSONObject(json);
+            /** The provided JSON data are corrupt, so I have to fix them before calling the JSONObject */
+            JSONObject recipesData = new JSONObject("{ \"recipes\": " + json + "}");
 
-            /** Get the movies' data array */
-            JSONArray arrResults =  moviesData.getJSONArray("results");
-
-            int maxResults = arrResults.length();
-            for (int i=0; i<maxResults; i++) {
-                /** Get the movie's data */
-                JSONObject movie = arrResults.getJSONObject(i);
+            /** Get the recipes' data array */
+            JSONArray arrRecipes =  recipesData.getJSONArray("recipes");
+            for (int i=0; i<arrRecipes.length(); i++) {
+                /** Get the recipes's data */
+                JSONObject recipeJSON = arrRecipes.getJSONObject(i);
 
                 recipe = new Recipe();
-                recipe.setId(movie.optInt("id"));
-                recipe.setName(movie.optString("poster_path"));
+                recipe.setId(recipeJSON.optInt("id"));
+                recipe.setName(recipeJSON.optString("name"));
+                recipe.setServings(recipeJSON.optInt("servings"));
+                recipe.setImage(recipeJSON.optString("image"));
 
-                recipeListItems.add(recipe);
+                /** Get the ingredients' data array */
+                JSONArray arrIngredients =  recipeJSON.getJSONArray("ingredients");
+                recipeIngredients = new ArrayList<>();
+                for (int ii=0; ii<arrIngredients.length(); ii++) {
+                    /** Get the ingredients's data */
+                    JSONObject ingredientJSON = arrIngredients.getJSONObject(ii);
+
+                    ingredient = new Ingredient();
+                    ingredient.setIngredient(ingredientJSON.optString("ingredient"));
+                    ingredient.setQuantity(ingredientJSON.optInt("quantity"));
+                    ingredient.setMeasure(ingredientJSON.optString("measure"));
+
+                    recipeIngredients.add(ingredient);
+                }
+                recipe.setIngredients(recipeIngredients);
+
+                /** Get the steps' data array */
+                JSONArray arrSteps =  recipeJSON.getJSONArray("steps");
+                recipeSteps = new ArrayList<>();
+                for (int ii=0; ii<arrSteps.length(); ii++) {
+                    /** Get the steps's data */
+                    JSONObject stepJSON = arrSteps.getJSONObject(ii);
+
+                    step = new Step();
+                    step.setId(stepJSON.optInt("id"));
+                    step.setShortDescription(stepJSON.optString("shortDescription"));
+                    step.setDescription(stepJSON.optString("description"));
+                    step.setVideoURL(stepJSON.optString("videoURL"));
+                    step.setThumbnailURL(stepJSON.optString("thumbnailURL"));
+
+                    recipeSteps.add(step);
+                }
+                recipe.setSteps(recipeSteps);
+
+                returnRecipeListItems.add(recipe);
             }
+
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        return recipeListItems;
+        return returnRecipeListItems;
     }
 
 }
