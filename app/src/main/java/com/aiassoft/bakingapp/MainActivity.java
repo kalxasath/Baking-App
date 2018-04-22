@@ -24,7 +24,13 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aiassoft.bakingapp.model.Recipe;
@@ -34,10 +40,14 @@ import com.aiassoft.bakingapp.utilities.NetworkUtils;
 import java.net.URL;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 import static android.widget.Toast.*;
 
 public class MainActivity extends AppCompatActivity
-        implements LoaderCallbacks<List<Recipe>> {
+        implements RecipesListAdapter.RecipesAdapterOnClickHandler,
+        LoaderCallbacks<List<Recipe>> {
 
     private static final String LOG_TAG = MyApp.APP_TAG + MainActivity.class.getSimpleName();
 
@@ -47,10 +57,56 @@ public class MainActivity extends AppCompatActivity
      */
     private static final String LOADER_EXTRA = "web_url";
 
+    /* The Movies List Adapter */
+    private RecipesListAdapter mRecipesListAdapter;
+
+    /** The views in the xml file */
+    /** The recycler view */
+    @BindView(R.id.rv_recipes) RecyclerView mRecyclerView;
+
+    /** The Error Message Block,
+     * is used to display errors and will be hidden if there are no error
+     */
+    @BindView(R.id.ll_error_message) LinearLayout mErrorMessageBlock;
+
+    /** The view holding the error message */
+    @BindView(R.id.tv_error_message_text) TextView mErrorMessageText;
+
+    /**
+     * The ProgressBar that will indicate to the user that we are loading data.
+     * It will be hidden when no data is loading.
+     */
+    @BindView(R.id.pb_loading_indicator) ProgressBar mLoadingIndicator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+
+        /*
+         * The gridLayoutManager is responsible for measuring and positioning item views within a
+         * RecyclerView into a grid.
+         */
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
+
+        /* setLayoutManager associates the gridLayoutManager with our RecyclerView */
+        mRecyclerView.setLayoutManager(gridLayoutManager);
+
+        /*
+         * Use this setting to improve performance if you know that changes in content do not
+         * change the child layout size in the RecyclerView
+         */
+        mRecyclerView.setHasFixedSize(true);
+
+        /*
+         * The RecipesListAdapter is responsible for linking our recipes' data with the Views that
+         * will end up displaying our movie data.
+         */
+        mRecipesListAdapter = new RecipesListAdapter(this);
+
+        /* Setting the adapter attaches it to the RecyclerView in our layout. */
+        mRecyclerView.setAdapter(mRecipesListAdapter);
 
         /* We will check if we are connected to the internet */
         if (! NetworkUtils.isOnline()) {
@@ -185,8 +241,20 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onLoadFinished(Loader<List<Recipe>> loader, List<Recipe> data) {
-        // TODO: mpla mpla
-    }
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+
+        /* Update the adapters data with the new one */
+        mRecipesListAdapter.setRecipesData(data);
+
+        /* Check for error */
+        if (null == data) {
+            /* If an error has occurred, show the error message */
+            showErrorMessage(R.string.unexpected_fetch_error);
+        } else {
+            /* Else show the recipes list */
+            showRecipesListView();
+        }
+    } // onLoadFinished
 
     /**
      * Called when a previously created loader is being reset, and thus
@@ -203,5 +271,68 @@ public class MainActivity extends AppCompatActivity
          */
     }
 
+    /**
+     * This method is used when we need to reset the data
+     */
+    private void invalidateData() {
+        mRecipesListAdapter.invalidateData();
+    }
+
+    /**
+     * This method is for responding to clicks from our list.
+     *
+     * @param movieId the Id from the selected movie
+     */
+    @Override
+    public void onClick(int movieId) {
+        /* Prepare to call the detail activity, to show the recipe's details */
+        /*
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra(DetailActivity.EXTRA_MOVIE_ID, movieId);
+        startActivity(intent);
+        */
+    }
+
+    /**
+     * This method will make the View for the movies list visible and
+     * hides the error message block.
+     */
+    private void showRecipesListView() {
+        /* First, make sure the error block is invisible */
+        mErrorMessageBlock.setVisibility(View.INVISIBLE);
+        /* Then, make sure the recipes list is visible */
+        mRecyclerView.setVisibility(View.VISIBLE);
+    } // showMoviesListView
+
+    /**
+     * This method will make the error message visible,
+     * populate the error message with the corresponding error message block,
+     * and hides the movie details.
+     * @param errorId The error message string id
+     */
+    private void showErrorMessage(int errorId) {
+        /* First, hide the currently visible recipes list */
+        mRecyclerView.setVisibility(View.INVISIBLE);
+        /* Then, show the error block */
+        mErrorMessageBlock.setVisibility(View.VISIBLE);
+        /* Show the corresponding error message */
+        mErrorMessageText.setText(getString(errorId));
+    } // showErrorMessage
+
+    /**
+     * Called when a tap occurs in the refresh button
+     * @param view The view which reacted to the click
+     */
+    public void onRefreshButtonClick(View view) {
+        /* Again check if we are connected to the internet */
+        if (NetworkUtils.isOnline()) {
+            /* If the network connectivity is restored
+             * show the recipes List to hide the error block, and
+             * fetch recipes' data from the internet
+             */
+            showRecipesListView();
+            fetchRecipesList();
+        }
+    } // onRefreshButtonClick
 
 }

@@ -72,12 +72,8 @@ public class JsonUtils {
         Step step;
 
         try {
-            /** Creates a new JSONObject with name/value mappings from the json string */
-            /** The provided JSON data are corrupt, so I have to fix them before calling the JSONObject */
-            JSONObject recipesData = new JSONObject("{ \"recipes\": " + json + "}");
-
             /** Get the recipes' data array */
-            JSONArray arrRecipes =  recipesData.getJSONArray("recipes");
+            JSONArray arrRecipes = new JSONArray(json);
             for (int i=0; i<arrRecipes.length(); i++) {
                 /** Get the recipes's data */
                 JSONObject recipeJSON = arrRecipes.getJSONObject(i);
