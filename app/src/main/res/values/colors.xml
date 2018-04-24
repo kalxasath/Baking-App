@@ -23,16 +23,11 @@
     <color name="colorPrimaryDark">#c7a500</color>
     <color name="colorAccent">#ffff52</color>
 
-
     <color name="primary_light">#B2DFDB</color>
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#757575</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
-
-
-    <color name="bgMovieTitle">#009688</color>
-    <color name="frMovieTitle">#ffffff</color>
 
     <color name="textPrimary">#FFFFFF</color>
     <color name="textTitle">#D0000000</color>
@@ -45,7 +40,7 @@
     <color name="red">#FF0000</color>
     <color name="green">#00FF00</color>
     <color name="blue">#0000ff</color>
-    <color name="orange">#FFA500</color>
-    <color name="pink">#FFC0CB</color>
+    <color name="orange">#ffa500</color>
+    <color name="pink">#ffc0cb</color>
     <color name="blanchedAlmond">#FFEBCD</color>
 </resources>

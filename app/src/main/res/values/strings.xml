@@ -29,4 +29,6 @@
     <string name="error_check_your_network_connectivity">Please check your network connectivity, and then click the button [Refresh]</string>
 
     <string name="recipe_image_content_description">Recipe Image Content Description</string>
+
+    <string name="recipe_servings">servings:</string>
 </resources>

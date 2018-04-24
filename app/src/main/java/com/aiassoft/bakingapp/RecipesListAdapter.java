@@ -77,8 +77,9 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
             implements View.OnClickListener {
 
         /* layout bindings */
-        @BindView(R.id.tv_name)
-        TextView mName;
+        @BindView(R.id.iv_recipe_image) ImageView mRecipeImage;
+        @BindView(R.id.tv_name) TextView mName;
+        @BindView(R.id.tv_servings) TextView mServings;
 
         public RecipesAdapterViewHolder(View view) {
             super(view);
@@ -131,14 +132,18 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
      */
     @Override
     public void onBindViewHolder(RecipesAdapterViewHolder RecipesAdapterViewHolder, int position) {
-        String s = mRecipesData.get(position).getName();
+        Recipe recipe = mRecipesData.get(position);
 
-        RecipesAdapterViewHolder.mName.setText(s);
-        /*
-        Picasso.with(RecipesAdapterViewHolder.mMoviePoster.getContext())
-                .load(NetworkUtils.buildPosterUrl(s))
-                .into(RecipesAdapterViewHolder.mMoviePoster);
-        */
+        RecipesAdapterViewHolder.mName.setText(recipe.getName());
+        RecipesAdapterViewHolder.mServings.setText(
+                RecipesAdapterViewHolder.mServings.getContext().getString(R.string.recipe_servings)
+                + " " + recipe.getServings());
+
+        Picasso.with(RecipesAdapterViewHolder.mRecipeImage.getContext())
+                .load(R.drawable.no_recipe_image_available)
+                .placeholder(R.drawable.no_recipe_image_available)
+                .into(RecipesAdapterViewHolder.mRecipeImage);
+
     }
 
     /**
