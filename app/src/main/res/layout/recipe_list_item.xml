@@ -44,7 +44,7 @@
         android:layout_marginBottom="@dimen/card_view_margin_top_bottom"
         card_view:cardElevation="@dimen/card_view_elevation"
         card_view:cardMaxElevation="@dimen/card_view_max_elevation"
-        card_view:cardBackgroundColor="@color/pink"
+        card_view:cardBackgroundColor="@color/cardBackgroundColor"
         card_view:cardCornerRadius="@dimen/card_view_corner_radious">
 
         <RelativeLayout

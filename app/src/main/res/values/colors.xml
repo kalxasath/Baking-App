@@ -35,6 +35,8 @@
     <color name="textPrimaryContent">#60000000</color>
     <color name="textSecondaryContent">#60000000</color>
 
+    <color name="cardBackgroundColor">#EEEEEE</color>
+
     <color name="black">#000000</color>
     <color name="yellow">#FFFF00</color>
     <color name="red">#FF0000</color>

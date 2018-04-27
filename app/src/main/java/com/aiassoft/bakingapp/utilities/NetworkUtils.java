@@ -21,12 +21,16 @@ package com.aiassoft.bakingapp.utilities;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.util.Log;
 
+import com.aiassoft.bakingapp.Const;
 import com.aiassoft.bakingapp.MyApp;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
@@ -36,6 +40,45 @@ import java.util.Scanner;
 public class NetworkUtils {
     private static final String LOG_TAG = MyApp.APP_TAG + NetworkUtils.class.getSimpleName();
 
+    /**
+     * Builds the URL to download the Pictures' data
+     *
+     * @param tags The Pictures tags
+     * @return     The URL to get the Pictures' data according the tags
+     */
+    private static URL buildFlickrGetPicturesUrl(String tags, Boolean addExtraTag) {
+        Uri builtUri = Uri.parse(Const.FLICKR_IMAGES_URL).buildUpon()
+                .appendQueryParameter(Const.FLICKR_PARAM_FORMAT, Const.FLICKR_PARAM_FORMAT_JSON)
+                .appendQueryParameter(Const.FLICKR_PARAM_TAGS, (addExtraTag ? Const.FLICKR_PARAM_ADD_TAGS : "") + tags)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        Log.d(LOG_TAG, "Builded GetPictures URL: " + url);
+
+        return url;
+    }
+
+
+
+    public static String getRandomImage(String tags, Boolean addExtraTag) throws IOException {
+        String s = getResponseFromHttpUrl(buildFlickrGetPicturesUrl(tags, addExtraTag));
+        /**
+         * strip out the function name since in java I don't know how
+         * how to call the callback from a string. Any Suggestion?
+         */
+        s = s.substring(s.indexOf("(") + 1);
+        s = s.substring(0, s.length()-1);
+
+        Log.d(LOG_TAG, "final json: " + s);
+
+        return JsonUtils.jsonFlickrGetPicture(s);
+    }
 
     /**
      * This method returns the entire result from the HTTP response.

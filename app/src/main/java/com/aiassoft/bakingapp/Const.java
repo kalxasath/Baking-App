@@ -42,6 +42,16 @@ public class Const {
     public static final String RECIPE_LIST_URL = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
 
     /**
+     * random images from flickr
+     */
+    public static final String FLICKR_IMAGES_URL = "https://api.flickr.com/services/feeds/photos_public.gne";
+    public static final String FLICKR_PARAM_TAGS = "tags";
+    public static final String FLICKR_PARAM_FORMAT = "format";
+    public static final String FLICKR_PARAM_FORMAT_JSON = "json";
+    public static final String FLICKR_PARAM_ADD_TAGS = "Recipe ";
+
+
+    /**
      * youtube definitions
      */
     public static final String YOUTUBE_APP_URI = "vnd.youtube:";

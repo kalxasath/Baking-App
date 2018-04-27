@@ -38,6 +38,7 @@ import com.aiassoft.bakingapp.utilities.JsonUtils;
 import com.aiassoft.bakingapp.utilities.NetworkUtils;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -208,8 +209,28 @@ public class MainActivity extends AppCompatActivity
                     URL getTheRecipesUrl = new URL(recipeListUrl);
 
                     /** if succeed returns a List of MoviesReviewsListItem objects */
-                    return JsonUtils.parseRecipesListJson(
+                    List<Recipe> recipes = JsonUtils.parseRecipesListJson(
                             NetworkUtils.getResponseFromHttpUrl(getTheRecipesUrl));
+
+                    /** ONLY FOR THE TEST PHASE, ADD MORE RECIPES */
+                    List <Recipe> r1 = new ArrayList<>(recipes);
+                    r1.addAll()
+                    List <Recipe> r2 = new ArrayList<>();
+                    r2.addAll(recipes);
+                    recipes.addAll(r1);
+                    recipes.addAll(r2);
+
+                    for(Recipe recipe: recipes) {
+                        if (recipe.getImage().isEmpty())
+                            recipe.setImage(NetworkUtils.getRandomImage(recipe.getName(), true));
+                    }
+                    /** try another time */
+                    for(Recipe recipe: recipes) {
+                        if (recipe.getImage().isEmpty())
+                            recipe.setImage(NetworkUtils.getRandomImage(recipe.getName(), false));
+                    }
+
+                    return recipes;
 
                 } catch (Exception e) {
                     /** If fails returns null to significate the error */
@@ -243,15 +264,15 @@ public class MainActivity extends AppCompatActivity
     public void onLoadFinished(Loader<List<Recipe>> loader, List<Recipe> data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
 
-        /* Update the adapters data with the new one */
+        /** Update the adapters data with the new one */
         mRecipesListAdapter.setRecipesData(data);
 
-        /* Check for error */
+        /** Check for error */
         if (null == data) {
-            /* If an error has occurred, show the error message */
+            /** If an error has occurred, show the error message */
             showErrorMessage(R.string.unexpected_fetch_error);
         } else {
-            /* Else show the recipes list */
+            /** Else show the recipes list */
             showRecipesListView();
         }
     } // onLoadFinished
@@ -265,7 +286,7 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onLoaderReset(Loader<List<Recipe>> loader) {
-        /*
+        /**
          * We aren't using this method in this application, but we are required to Override
          * it to implement the LoaderCallbacks<List<MoviesReviewsListItem>> interface
          */
@@ -285,8 +306,8 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onClick(int movieId) {
-        /* Prepare to call the detail activity, to show the recipe's details */
-        /*
+        /** Prepare to call the detail activity, to show the recipe's details */
+        /**
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(DetailActivity.EXTRA_MOVIE_ID, movieId);
         startActivity(intent);
@@ -298,9 +319,9 @@ public class MainActivity extends AppCompatActivity
      * hides the error message block.
      */
     private void showRecipesListView() {
-        /* First, make sure the error block is invisible */
+        /** First, make sure the error block is invisible */
         mErrorMessageBlock.setVisibility(View.INVISIBLE);
-        /* Then, make sure the recipes list is visible */
+        /** Then, make sure the recipes list is visible */
         mRecyclerView.setVisibility(View.VISIBLE);
     } // showMoviesListView
 
@@ -311,11 +332,11 @@ public class MainActivity extends AppCompatActivity
      * @param errorId The error message string id
      */
     private void showErrorMessage(int errorId) {
-        /* First, hide the currently visible recipes list */
+        /** First, hide the currently visible recipes list */
         mRecyclerView.setVisibility(View.INVISIBLE);
-        /* Then, show the error block */
+        /** Then, show the error block */
         mErrorMessageBlock.setVisibility(View.VISIBLE);
-        /* Show the corresponding error message */
+        /** Show the corresponding error message */
         mErrorMessageText.setText(getString(errorId));
     } // showErrorMessage
 
@@ -324,9 +345,9 @@ public class MainActivity extends AppCompatActivity
      * @param view The view which reacted to the click
      */
     public void onRefreshButtonClick(View view) {
-        /* Again check if we are connected to the internet */
+        /** Again check if we are connected to the internet */
         if (NetworkUtils.isOnline()) {
-            /* If the network connectivity is restored
+            /** If the network connectivity is restored
              * show the recipes List to hide the error block, and
              * fetch recipes' data from the internet
              */

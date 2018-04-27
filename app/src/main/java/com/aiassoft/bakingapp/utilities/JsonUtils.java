@@ -31,6 +31,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * JSON utilities helper class
@@ -127,6 +128,26 @@ public class JsonUtils {
         }
 
         return returnRecipeListItems;
+    }
+
+    public static String jsonFlickrGetPicture(String json) {
+        try {
+            JSONObject jo = new JSONObject(json);
+            JSONArray pictureItems = jo.optJSONArray("items");
+            if (pictureItems.length() > 0) {
+                Random rand = new Random();
+                int pos = rand.nextInt(pictureItems.length());
+                JSONObject picture = pictureItems.optJSONObject(pos);
+                if (picture != null) {
+                    JSONObject media = picture.optJSONObject("media");
+                    return media.optString("m");
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 
 }

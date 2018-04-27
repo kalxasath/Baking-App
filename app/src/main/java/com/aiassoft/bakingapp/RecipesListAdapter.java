@@ -139,10 +139,17 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
                 RecipesAdapterViewHolder.mServings.getContext().getString(R.string.recipe_servings)
                 + " " + recipe.getServings());
 
-        Picasso.with(RecipesAdapterViewHolder.mRecipeImage.getContext())
-                .load(R.drawable.no_recipe_image_available)
-                .placeholder(R.drawable.no_recipe_image_available)
-                .into(RecipesAdapterViewHolder.mRecipeImage);
+        if (recipe.getImage().isEmpty()) {
+            Picasso.with(RecipesAdapterViewHolder.mRecipeImage.getContext())
+                    .load(R.drawable.no_recipe_image_available)
+                    .placeholder(R.drawable.no_recipe_image_available)
+                    .into(RecipesAdapterViewHolder.mRecipeImage);
+        } else {
+            Picasso.with(RecipesAdapterViewHolder.mRecipeImage.getContext())
+                    .load(recipe.getImage())
+                    .placeholder(R.drawable.no_recipe_image_available)
+                    .into(RecipesAdapterViewHolder.mRecipeImage);
+        }
 
     }
 
@@ -163,7 +170,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
      * created one. This is handy when we get new data from the web but don't want to create a
      * new MoviesAdapter to display it.
      *
-     * @param RecipeIdsData The new recipes data to be displayed.
+     * @param recipesData The new recipes data to be displayed.
      */
     public void setRecipesData(List<Recipe> recipesData) {
         if (recipesData == null) return;
