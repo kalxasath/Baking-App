@@ -44,9 +44,6 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
 
     private static final String LOG_TAG = MyApp.APP_TAG + RecipesListAdapter.class.getSimpleName();
 
-    /* This array holds a list of recipe objects */
-    private ArrayList<Recipe> mRecipesData = new ArrayList<>();
-
     /**
      * Defining an on-click handler to make it easy for an Activity
      * to interface with the RecyclerView
@@ -85,6 +82,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
             super(view);
             ButterKnife.bind(this, view);
             view.setOnClickListener(this);
+            mRecipeImage.setOnClickListener(this);
         }
 
         /**
@@ -95,7 +93,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
-            int selectedRecipe = mRecipesData.get(adapterPosition).getId();
+            int selectedRecipe = MyApp.mRecipesData.get(adapterPosition).getId();
             mClickHandler.onClick(selectedRecipe);
         }
     }
@@ -132,7 +130,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
      */
     @Override
     public void onBindViewHolder(RecipesAdapterViewHolder RecipesAdapterViewHolder, int position) {
-        Recipe recipe = mRecipesData.get(position);
+        Recipe recipe = MyApp.mRecipesData.get(position);
 
         RecipesAdapterViewHolder.mName.setText(recipe.getName());
         RecipesAdapterViewHolder.mServings.setText(
@@ -161,8 +159,8 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
      */
     @Override
     public int getItemCount() {
-        if (null == mRecipesData) return 0;
-        return mRecipesData.size();
+        if (null == MyApp.mRecipesData) return 0;
+        return MyApp.mRecipesData.size();
     }
 
     /**
@@ -174,7 +172,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
      */
     public void setRecipesData(List<Recipe> recipesData) {
         if (recipesData == null) return;
-        mRecipesData.addAll(recipesData);
+        MyApp.mRecipesData.addAll(recipesData);
         notifyDataSetChanged();
     }
 
@@ -182,7 +180,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
      * This method is used when we are resetting data
      */
     public void invalidateData() {
-        mRecipesData = new ArrayList<Recipe>();
+        MyApp.mRecipesData = new ArrayList<Recipe>();
         notifyDataSetChanged();
     }
 

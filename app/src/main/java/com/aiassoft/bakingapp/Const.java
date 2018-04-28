@@ -30,6 +30,20 @@ public class Const {
      */
     private Const() {}
 
+    /**
+     * Set to TRUE if you want to multiply the recipes
+     */
+    public static final boolean MULTIPLY_THE_RECIPES = true;
+    /**
+     *  large multiplier increases the starting time because all the recipes are pictureless
+     *  and the find picture procedure is not optimized
+     */
+    public static final int RECIPES_MULTIPLIER = 0;
+    /**
+     * Add a random picture from flickr for each recipe
+     */
+    public static final boolean RECIPES_ADD_RANDOM_IMAGE_IF_NOT_EXIST = false;
+
 
     /**
      * This ID will be used to identify the Loader responsible for loading our movies list.

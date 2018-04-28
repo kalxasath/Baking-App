@@ -24,6 +24,10 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.view.View;
 
+import com.aiassoft.bakingapp.model.Recipe;
+
+import java.util.ArrayList;
+
 /**
  * Created by gvryn on 19/04/2018.
  * This application class is used to store static resources
@@ -34,6 +38,9 @@ public class MyApp extends Application {
     private static MyApp mInstance;
 
     public static final String APP_TAG = "Baking_App: ";
+
+    /* This array holds a list of recipe objects */
+    public static ArrayList<Recipe> mRecipesData = new ArrayList<>();
 
 
     /**

@@ -37,8 +37,12 @@ import com.aiassoft.bakingapp.model.Recipe;
 import com.aiassoft.bakingapp.utilities.JsonUtils;
 import com.aiassoft.bakingapp.utilities.NetworkUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -176,13 +180,13 @@ public class MainActivity extends AppCompatActivity
                 if (mCachedRecipeListData != null) {
                     deliverResult(mCachedRecipeListData);
                 } else {
-                    /**
-                    / * If Error Message Block is visible, hide it * /
+
+                    /** If Error Message Block is visible, hide it */
                     if (mErrorMessageBlock.getVisibility() == View.VISIBLE) {
-                        showMoviesListView();
+                        showRecipesListView();
                     }
                     mLoadingIndicator.setVisibility(View.VISIBLE);
-                    */
+
                     forceLoad();
                 }
             } // onStartLoading
@@ -212,22 +216,30 @@ public class MainActivity extends AppCompatActivity
                     List<Recipe> recipes = JsonUtils.parseRecipesListJson(
                             NetworkUtils.getResponseFromHttpUrl(getTheRecipesUrl));
 
-                    /** ONLY FOR THE TEST PHASE, ADD MORE RECIPES */
-                    List <Recipe> r1 = new ArrayList<>(recipes);
-                    r1.addAll()
-                    List <Recipe> r2 = new ArrayList<>();
-                    r2.addAll(recipes);
-                    recipes.addAll(r1);
-                    recipes.addAll(r2);
-
-                    for(Recipe recipe: recipes) {
-                        if (recipe.getImage().isEmpty())
-                            recipe.setImage(NetworkUtils.getRandomImage(recipe.getName(), true));
+                    if (Const.MULTIPLY_THE_RECIPES) {
+                        /** ONLY FOR THE TEST PHASE, ADD MORE RECIPES */
+                        GsonBuilder builder = new GsonBuilder();
+                        Gson gson = builder.create();
+                        for(int i=1; i<=Const.RECIPES_MULTIPLIER; i++) {
+                            List<Recipe> cloneRecipes = new ArrayList<>();
+                            for(Recipe recipe: recipes) {
+                                Recipe r = gson.fromJson(gson.toJson(recipe), Recipe.class);
+                                cloneRecipes.add(r);
+                            }
+                            recipes.addAll(cloneRecipes);
+                        }
                     }
-                    /** try another time */
-                    for(Recipe recipe: recipes) {
-                        if (recipe.getImage().isEmpty())
-                            recipe.setImage(NetworkUtils.getRandomImage(recipe.getName(), false));
+
+                    if (Const.RECIPES_ADD_RANDOM_IMAGE_IF_NOT_EXIST) {
+                        for(Recipe recipe: recipes) {
+                            if (recipe.getImage().isEmpty())
+                                recipe.setImage(NetworkUtils.getRandomImage(recipe.getName(), true));
+                        }
+                        /** try another time */
+                        for(Recipe recipe: recipes) {
+                            if (recipe.getImage().isEmpty())
+                                recipe.setImage(NetworkUtils.getRandomImage(recipe.getName(), false));
+                        }
                     }
 
                     return recipes;
@@ -305,7 +317,8 @@ public class MainActivity extends AppCompatActivity
      * @param movieId the Id from the selected movie
      */
     @Override
-    public void onClick(int movieId) {
+    public void onClick(int recipeId) {
+        Toast.makeText(this, "cliked: " + recipeId, Toast.LENGTH_SHORT).show();
         /** Prepare to call the detail activity, to show the recipe's details */
         /**
         Intent intent = new Intent(this, DetailActivity.class);

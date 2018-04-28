@@ -32,6 +32,9 @@ dependencies {
     // Picasso dependency
     implementation 'com.squareup.picasso:picasso:2.5.2'
 
+    // GSon
+    implementation 'com.google.code.gson:gson:2.8.3'
+
     // Butter Knife dependency
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
