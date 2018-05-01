@@ -93,8 +93,8 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
-            int selectedRecipe = MyApp.mRecipesData.get(adapterPosition).getId();
-            mClickHandler.onClick(selectedRecipe);
+            //int selectedRecipe = MyApp.mRecipesData.get(adapterPosition).getId();
+            mClickHandler.onClick(adapterPosition);
         }
     }
 
@@ -164,9 +164,9 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
     }
 
     /**
-     * This method is used to set the recipe on a MoviesAdapter if we've already
+     * This method is used to set the recipe on a RecipesAdapter if we've already
      * created one. This is handy when we get new data from the web but don't want to create a
-     * new MoviesAdapter to display it.
+     * new RecipesAdapter to display it.
      *
      * @param recipesData The new recipes data to be displayed.
      */

@@ -22,8 +22,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
+import com.aiassoft.bakingapp.model.Recipe;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -34,7 +39,26 @@ public class RecipeActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MyApp.APP_TAG + MainActivity.class.getSimpleName();
 
+    /**
+     * Identifies the incoming parameter of the recipe id
+     */
+    public static final String EXTRA_ARRAY_POS = "array_pos";
+
+    /**
+     * If there is not a recipe id, this id will as the default one
+     */
+    private static final int DEFAULT_RECIPE_POS = -1;
+
     private static Context mContext = null;
+    private static Recipe mRecipe = null;
+    private static int mRecipePos = DEFAULT_RECIPE_POS;
+
+    /* The Ingredients List Adapter */
+    private IngredientsListAdapter mIngredientsListAdapter;
+
+    /** The views in the xml file */
+    /** The recycler view */
+    @BindView(R.id.rv_ingredients) RecyclerView mIngredientsRecyclerView;
 
     /**
      * Creates the detail activity
@@ -55,32 +79,41 @@ public class RecipeActivity extends AppCompatActivity {
             closeOnError();
         }
 
-//        /** Intent parameter should be a valid movie id. if not, show error toast and return */
-//        mMovieId = intent.getIntExtra(EXTRA_MOVIE_ID, DEFAULT_MOVIE_ID);
-//        if (mMovieId == DEFAULT_MOVIE_ID) {
-//            // EXTRA_MOVIE_ID not found in intent's parameter
-//            closeOnError();
-//        }
+        /** Intent parameter should be a valid recipe id. if not, show error toast and return */
+        mRecipePos = intent.getIntExtra(EXTRA_ARRAY_POS, DEFAULT_RECIPE_POS);
+        if (mRecipePos == DEFAULT_RECIPE_POS) {
+            // EXTRA_RECIPE_ID not found in intent's parameter
+            closeOnError();
+        }
 
+        mRecipe = MyApp.mRecipesData.get(mRecipePos);
 
-//        /**
-//         *  Initialize Videos Section
-//         */
-//        LinearLayoutManager linearLayoutVideoManager
-//                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-//
-//        mRecyclerViewVideos.setLayoutManager(linearLayoutVideoManager);
-//        mRecyclerViewVideos.setHasFixedSize(true);
-//
-//        /**
-//         * The mMovieVideosListAdapter is responsible for linking our movie's videos data with the Views that
-//         * will end up displaying our videos' data.
-//         */
-//        mMovieVideosListAdapter = new MovieVideosListAdapter(this);
-//
-//        /* Setting the adapter attaches it to the RecyclerView in our layout. */
-//        mRecyclerViewVideos.setAdapter(mMovieVideosListAdapter);
-//
+        setTitle(mRecipe.getName());
+
+        /**
+         *  Initialize Ingredients Section
+         */
+        LinearLayoutManager linearLayoutVideoManager
+                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false) {
+
+//            @Override
+//            public boolean canScrollVertically() {
+//                return false;
+//            }
+        };
+
+        mIngredientsRecyclerView.setLayoutManager(linearLayoutVideoManager);
+        mIngredientsRecyclerView.setHasFixedSize(false);
+
+        /**
+         * The mRecipeListAdapter is responsible for linking our recipe's videos data with the Views that
+         * will end up displaying our videos' data.
+         */
+        mIngredientsListAdapter = new IngredientsListAdapter();
+
+        /* Setting the adapter attaches it to the RecyclerView in our layout. */
+        mIngredientsRecyclerView.setAdapter(mIngredientsListAdapter);
+        //mIngredientsRecyclerView.setNestedScrollingEnabled(false);
 //        /**
 //         *  Initialize Reviews Section
 //         */
@@ -91,7 +124,7 @@ public class RecipeActivity extends AppCompatActivity {
 //        mRecyclerViewReviews.setHasFixedSize(true);
 //
 //        /**
-//         * The mMovieReviewsListAdapter is responsible for linking our movie's reviews data with the Views that
+//         * The mMovieReviewsListAdapter is responsible for linking our recipe's reviews data with the Views that
 //         * will end up displaying our reviews' data.
 //         */
 //        mMovieReviewsListAdapter = new MovieReviewsListAdapter();
@@ -109,7 +142,11 @@ public class RecipeActivity extends AppCompatActivity {
 //            /** Otherwise fetch movies' data from the internet */
 //            fetchMoviesDetails();
 //        }
+        setIngredients();
+    }
 
+    private void setIngredients() {
+        mIngredientsListAdapter.setIngredientsData(mRecipe.getIngredients());
     }
 
     private void closeOnError() {

@@ -8,4 +8,25 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+
+    <style name="ingredientsTitle" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/textPrimaryContent</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+    </style>
+
+    <style name="ingredientsLayout">
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:background">@drawable/solid_pi_box</item>
+    </style>
+
+    <style name="seratedPageBottom">
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
+        <item name="android:background">@drawable/serated_page_bottom</item>
+    </style>
+
 </resources>

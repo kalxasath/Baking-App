@@ -23,7 +23,7 @@ import com.aiassoft.bakingapp.MyApp;
 import java.util.List;
 
 /**
- * The Movies List Item Object, holds all the necessary information of a list item
+ * The Recipes List Item Object, holds all the necessary information of a list item
  */
 public class Recipe {
     private static final String LOG_TAG = MyApp.APP_TAG + Recipe.class.getSimpleName();

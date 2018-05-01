@@ -46,7 +46,7 @@ public class Const {
 
 
     /**
-     * This ID will be used to identify the Loader responsible for loading our movies list.
+     * This ID will be used to identify the Loader responsible for loading our recipes list.
      */
     public static final int RECIPES_LOADER_ID = 0;
 

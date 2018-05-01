@@ -33,9 +33,13 @@
     <color name="textTitle">#D0000000</color>
     <color name="textSubtitle">#75000000</color>
     <color name="textPrimaryContent">#60000000</color>
-    <color name="textSecondaryContent">#60000000</color>
+    <color name="textSecondaryContent">#40000000</color>
 
     <color name="cardBackgroundColor">#EEEEEE</color>
+    <color name="dottedLineColor">#40000000</color>
+    <color name="solidLineColor">#E7E7E7</color>
+
+    <color name="ingredientsOddLineBackgroundColor">#F1F7F7</color>
 
     <color name="black">#000000</color>
     <color name="yellow">#FFFF00</color>

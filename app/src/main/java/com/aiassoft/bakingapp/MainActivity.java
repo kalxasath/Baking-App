@@ -18,6 +18,7 @@
 
 package com.aiassoft.bakingapp;
 
+import android.content.Intent;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity
      */
     private static final String LOADER_EXTRA = "web_url";
 
-    /* The Movies List Adapter */
+    /* The Recipes List Adapter */
     private RecipesListAdapter mRecipesListAdapter;
 
     /** The views in the xml file */
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity
 
         /*
          * The RecipesListAdapter is responsible for linking our recipes' data with the Views that
-         * will end up displaying our movie data.
+         * will end up displaying our recipe data.
          */
         mRecipesListAdapter = new RecipesListAdapter(this);
 
@@ -314,17 +315,14 @@ public class MainActivity extends AppCompatActivity
     /**
      * This method is for responding to clicks from our list.
      *
-     * @param movieId the Id from the selected movie
+     * @param movieId the Id from the selected recipe
      */
     @Override
-    public void onClick(int recipeId) {
-        Toast.makeText(this, "cliked: " + recipeId, Toast.LENGTH_SHORT).show();
+    public void onClick(int adapterPosition) {
         /** Prepare to call the detail activity, to show the recipe's details */
-        /**
-        Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra(DetailActivity.EXTRA_MOVIE_ID, movieId);
+        Intent intent = new Intent(this, RecipeActivity.class);
+        intent.putExtra(RecipeActivity.EXTRA_ARRAY_POS, adapterPosition);
         startActivity(intent);
-        */
     }
 
     /**
@@ -341,7 +339,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * This method will make the error message visible,
      * populate the error message with the corresponding error message block,
-     * and hides the movie details.
+     * and hides the recipe details.
      * @param errorId The error message string id
      */
     private void showErrorMessage(int errorId) {
