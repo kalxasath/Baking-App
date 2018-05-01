@@ -98,6 +98,9 @@ public class JsonUtils {
                     ingredient.setMeasure(ingredientJSON.optString("measure"));
 
                     recipeIngredients.add(ingredient);
+                    recipeIngredients.add(ingredient);
+                    recipeIngredients.add(ingredient);
+                    recipeIngredients.add(ingredient);
                 }
                 recipe.setIngredients(recipeIngredients);
 
