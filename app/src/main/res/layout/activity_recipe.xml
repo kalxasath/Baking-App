@@ -64,11 +64,18 @@
                 style="@style/ingredientsLayout"
                 >
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/rv_ingredients"
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    />
+                    android:descendantFocusability="blocksDescendants">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/rv_ingredients"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                         />
+
+                </RelativeLayout>
 
             </LinearLayout>
 
@@ -78,6 +85,39 @@
                 style="@style/seratedPageBottom"
                 android:orientation="vertical"
                  />
+
+
+            <TextView
+                android:id="@+id/tv_ingredients_title"
+                style="@style/ingredientsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/recipe_title_method" />
+
+            <ImageView
+                android:id="@+id/iv_ingredients_separator"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:src="@drawable/dotted_line"
+                android:layerType="software" />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:descendantFocusability="blocksDescendants">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_method_steps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    />
+
+            </RelativeLayout>
 
 
         </LinearLayout>

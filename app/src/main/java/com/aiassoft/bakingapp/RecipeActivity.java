@@ -35,7 +35,8 @@ import butterknife.ButterKnife;
  * Created by gvrynios on 28/04/18.
  */
 
-public class RecipeActivity extends AppCompatActivity {
+public class RecipeActivity extends AppCompatActivity
+        implements MethodStepsListAdapter.MethodStepsAdapterOnClickHandler {
 
     private static final String LOG_TAG = MyApp.APP_TAG + MainActivity.class.getSimpleName();
 
@@ -53,12 +54,18 @@ public class RecipeActivity extends AppCompatActivity {
     private static Recipe mRecipe = null;
     private static int mRecipePos = DEFAULT_RECIPE_POS;
 
-    /* The Ingredients List Adapter */
+    /** The Ingredients List Adapter */
     private IngredientsListAdapter mIngredientsListAdapter;
 
+    /** The Method Steps Adapter */
+    private MethodStepsListAdapter mMethodStepsListAdapter;
+
     /** The views in the xml file */
-    /** The recycler view */
+    /** The Ingredients recycler view */
     @BindView(R.id.rv_ingredients) RecyclerView mIngredientsRecyclerView;
+
+    /** The Method Steps recycler view */
+    @BindView(R.id.rv_method_steps) RecyclerView mMethodStepsRecyclerView;
 
     /**
      * Creates the detail activity
@@ -94,13 +101,7 @@ public class RecipeActivity extends AppCompatActivity {
          *  Initialize Ingredients Section
          */
         LinearLayoutManager linearLayoutVideoManager
-                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false) {
-
-//            @Override
-//            public boolean canScrollVertically() {
-//                return false;
-//            }
-        };
+                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
         mIngredientsRecyclerView.setLayoutManager(linearLayoutVideoManager);
         mIngredientsRecyclerView.setHasFixedSize(false);
@@ -114,39 +115,31 @@ public class RecipeActivity extends AppCompatActivity {
         /* Setting the adapter attaches it to the RecyclerView in our layout. */
         mIngredientsRecyclerView.setAdapter(mIngredientsListAdapter);
         //mIngredientsRecyclerView.setNestedScrollingEnabled(false);
-//        /**
-//         *  Initialize Reviews Section
-//         */
-//        LinearLayoutManager linearLayoutReviewsManager
-//                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-//
-//        mRecyclerViewReviews.setLayoutManager(linearLayoutReviewsManager);
-//        mRecyclerViewReviews.setHasFixedSize(true);
-//
-//        /**
-//         * The mMovieReviewsListAdapter is responsible for linking our recipe's reviews data with the Views that
-//         * will end up displaying our reviews' data.
-//         */
-//        mMovieReviewsListAdapter = new MovieReviewsListAdapter();
-//
-//        /** Setting the adapter attaches it to the RecyclerView in our layout. */
-//        mRecyclerViewReviews.setAdapter(mMovieReviewsListAdapter);
-//
-//        /** We will check if we are connected to the internet */
-//        if (!NetworkUtils.isOnline()) {
-//            /** We are not connected, show the Error Block
-//             *  with the propriety error message
-//             */
-//            showErrorMessage(R.string.error_check_your_network_connectivity);
-//        } else {
-//            /** Otherwise fetch movies' data from the internet */
-//            fetchMoviesDetails();
-//        }
-        setIngredients();
+
+        /**
+         *  Initialize Method Steps Section
+         */
+        LinearLayoutManager linearLayoutMethodStepsManager
+                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+
+        mMethodStepsRecyclerView.setLayoutManager(linearLayoutMethodStepsManager);
+        mMethodStepsRecyclerView.setHasFixedSize(true);
+
+        /**
+         * The mMethodStepsListAdapter is responsible for linking our recipe's method steps data
+         * with the Views that will end up displaying our method steps' data.
+         */
+        mMethodStepsListAdapter = new MethodStepsListAdapter(this);
+
+        /** Setting the adapter attaches it to the RecyclerView in our layout. */
+        mMethodStepsRecyclerView.setAdapter(mMethodStepsListAdapter);
+
+        populateRecipeData();
     }
 
-    private void setIngredients() {
+    private void populateRecipeData() {
         mIngredientsListAdapter.setIngredientsData(mRecipe.getIngredients());
+        mMethodStepsListAdapter.setMethodStepsData(mRecipe.getSteps());
     }
 
     private void closeOnError() {
@@ -154,5 +147,8 @@ public class RecipeActivity extends AppCompatActivity {
         Toast.makeText(this, R.string.recipe_activity_error_message, Toast.LENGTH_SHORT).show();
     }
 
-
+    @Override
+    public void onClick(int position) {
+        Toast.makeText(this, "pos: " + position, Toast.LENGTH_SHORT).show();
+    }
 }

@@ -98,9 +98,6 @@ public class JsonUtils {
                     ingredient.setMeasure(ingredientJSON.optString("measure"));
 
                     recipeIngredients.add(ingredient);
-                    recipeIngredients.add(ingredient);
-                    recipeIngredients.add(ingredient);
-                    recipeIngredients.add(ingredient);
                 }
                 recipe.setIngredients(recipeIngredients);
 
@@ -113,7 +110,7 @@ public class JsonUtils {
 
                     step = new Step();
                     step.setId(stepJSON.optInt("id"));
-                    step.setShortDescription(stepJSON.optString("shortDescription"));
+                    step.setName(stepJSON.optString("shortDescription"));
                     step.setDescription(stepJSON.optString("description"));
                     step.setVideoURL(stepJSON.optString("videoURL"));
                     step.setThumbnailURL(stepJSON.optString("thumbnailURL"));

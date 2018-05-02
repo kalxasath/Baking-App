@@ -20,15 +20,14 @@ package com.aiassoft.bakingapp;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.aiassoft.bakingapp.model.Recipe;
-import com.aiassoft.bakingapp.utilities.NetworkUtils;
-import com.squareup.picasso.Picasso;
+import com.aiassoft.bakingapp.model.Step;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,52 +36,53 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * {@link RecipesListAdapter} exposes a list of recipes to a
+ * {@link MethodStepsListAdapter} exposes a list of Method Steps to a
  * {@link android.support.v7.widget.RecyclerView}
  */
-public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.RecipesAdapterViewHolder> {
+public class MethodStepsListAdapter
+        extends RecyclerView.Adapter<MethodStepsListAdapter.MethodStepsAdapterViewHolder> {
 
-    private static final String LOG_TAG = MyApp.APP_TAG + RecipesListAdapter.class.getSimpleName();
+    private static final String LOG_TAG = MyApp.APP_TAG + MethodStepsListAdapter.class.getSimpleName();
+
+    /* This array holds a list of Method Steps objects */
+    private ArrayList<Step> mMethodStepsData = new ArrayList<>();
 
     /**
      * Defining an on-click handler to make it easy for an Activity
      * to interface with the RecyclerView
      */
-    private final RecipesAdapterOnClickHandler mClickHandler;
+    private final MethodStepsAdapterOnClickHandler mClickHandler;
 
     /**
      * The interface that receives OnClick messages
      */
-    public interface RecipesAdapterOnClickHandler {
-        void onClick(int recipeId);
+    public interface MethodStepsAdapterOnClickHandler {
+        void onClick(int position);
     }
 
     /**
-     * Creates a RecipesAdapter
+     * Creates a MethodStepsAdapter
      *
-     * @param clickHandler The on-click handler for this adapter. This single handler
-     *                     is called when an item is clicked
      */
-    public RecipesListAdapter(RecipesAdapterOnClickHandler clickHandler) {
+    public MethodStepsListAdapter(MethodStepsAdapterOnClickHandler clickHandler) {
         mClickHandler = clickHandler;
     }
 
     /**
-     * Cache of the children views for a Recipe list item
+     * Cache of the children views for a Method Step list item
      */
-    public class RecipesAdapterViewHolder extends RecyclerView.ViewHolder
+    public class MethodStepsAdapterViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
-        /* layout bindings */
-        @BindView(R.id.iv_recipe_image) ImageView mRecipeImage;
-        @BindView(R.id.tv_name) TextView mName;
-        @BindView(R.id.tv_servings) TextView mServings;
+        /** layout bindings */
+        @BindView(R.id.ll_method_step_row) LinearLayout mMethodStepRow;
+        @BindView(R.id.tv_method_step_name) TextView mMethodStepName;
+        @BindView(R.id.tv_method_description) TextView mMethodStepDescription;
 
-        public RecipesAdapterViewHolder(View view) {
+        public MethodStepsAdapterViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
             view.setOnClickListener(this);
-            mRecipeImage.setOnClickListener(this);
         }
 
         /**
@@ -93,7 +93,6 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
-            //int selectedRecipe = MyApp.mRecipesData.get(adapterPosition).getId();
             mClickHandler.onClick(adapterPosition);
         }
     }
@@ -105,74 +104,76 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
      * @param viewGroup The ViewGroup that these ViewHolders are contained within.
      * @param viewType  If your RecyclerView has more than one type of item (which ours doesn't) you
      *                  can use this viewType integer to provide a different layout.
-     * @return A new RecipeVideosAdapterViewHolder that holds the View for each list item
+     * @return A new IngredientVideosAdapterViewHolder that holds the View for each list item
      */
     @Override
-    public RecipesAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public MethodStepsAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
-        int layoutIdForListItem = R.layout.recipe_list_item;
+        int layoutIdForListItem = R.layout.method_step_list_item;
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
 
-        View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
-        return new RecipesAdapterViewHolder(view);
+        View view = inflater.inflate(layoutIdForListItem, viewGroup
+                , shouldAttachToParentImmediately);
+        return new MethodStepsAdapterViewHolder(view);
     }
 
     /**
      * OnBindViewHolder is called by the RecyclerView to display the data at the specified
-     * position. In this method, we update the contents of the ViewHolder to display the recipe
+     * position. In this method, we update the contents of the ViewHolder to display the Method Step
      * details for this particular position, using the "position" argument that is conveniently
      * passed into us.
      *
-     * @param RecipesAdapterViewHolder The ViewHolder which should be updated to represent the
+     * @param MethodStepsAdapterViewHolder The ViewHolder which should be updated to represent the
      *                                contents of the item at the given position in the data set.
      * @param position                The position of the item within the adapter's data set.
      */
     @Override
-    public void onBindViewHolder(RecipesAdapterViewHolder RecipesAdapterViewHolder, int position) {
-        Recipe recipe = MyApp.mRecipesData.get(position);
+    public void onBindViewHolder(MethodStepsAdapterViewHolder MethodStepsAdapterViewHolder
+            , int position) {
+        Step step = mMethodStepsData.get(position);
 
-        RecipesAdapterViewHolder.mName.setText(recipe.getName());
-        RecipesAdapterViewHolder.mServings.setText(
-                RecipesAdapterViewHolder.mServings.getContext().getString(R.string.recipe_servings)
-                + " " + recipe.getServings());
+        Context context = MethodStepsAdapterViewHolder.mMethodStepRow.getContext();
 
-        if (recipe.getImage().isEmpty()) {
-            Picasso.with(RecipesAdapterViewHolder.mRecipeImage.getContext())
-                    .load(R.drawable.no_recipe_image_available)
-                    .placeholder(R.drawable.no_recipe_image_available)
-                    .into(RecipesAdapterViewHolder.mRecipeImage);
-        } else {
-            Picasso.with(RecipesAdapterViewHolder.mRecipeImage.getContext())
-                    .load(recipe.getImage())
-                    .placeholder(R.drawable.no_recipe_image_available)
-                    .into(RecipesAdapterViewHolder.mRecipeImage);
+        if (position % 2 == 0) {
+            MethodStepsAdapterViewHolder.mMethodStepRow.setBackgroundColor(
+                    context.getResources().getColor(R.color.ingredientsOddLineBackgroundColor));
         }
 
+        MethodStepsAdapterViewHolder.mMethodStepName.setText(step.getName());
+
+        String abbreviation;
+        String description = step.getDescription();
+        if (description.length() >= 35) {
+            abbreviation = description.substring(0, 35)+ "...";
+        } else {
+            abbreviation = description;
+        }
+        MethodStepsAdapterViewHolder.mMethodStepDescription.setText(abbreviation);
     }
 
     /**
      * This method simply returns the number of items to display. It is used behind the scenes
      * to help layout our Views and for animations.
      *
-     * @return The number of items available in our RecipeIds list
+     * @return The number of items available in our Method Steps list
      */
     @Override
     public int getItemCount() {
-        if (null == MyApp.mRecipesData) return 0;
-        return MyApp.mRecipesData.size();
+        if (null == mMethodStepsData) return 0;
+        return mMethodStepsData.size();
     }
 
     /**
-     * This method is used to set the recipe on a RecipesAdapter if we've already
+     * This method is used to set the Method Step on a IngredientsAdapter if we've already
      * created one. This is handy when we get new data from the web but don't want to create a
-     * new RecipesAdapter to display it.
+     * new IngredientsAdapter to display it.
      *
-     * @param recipesData The new recipes data to be displayed.
+     * @param methodStepsData The new Method Step data to be displayed.
      */
-    public void setRecipesData(List<Recipe> recipesData) {
-        if (recipesData == null) return;
-        MyApp.mRecipesData.addAll(recipesData);
+    public void setMethodStepsData(List<Step> methodStepsData) {
+        if (methodStepsData == null) return;
+        mMethodStepsData.addAll(methodStepsData);
         notifyDataSetChanged();
     }
 
@@ -180,7 +181,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
      * This method is used when we are resetting data
      */
     public void invalidateData() {
-        MyApp.mRecipesData = new ArrayList<Recipe>();
+        mMethodStepsData = new ArrayList<>();
         notifyDataSetChanged();
     }
 

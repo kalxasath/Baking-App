@@ -28,7 +28,7 @@ public class Step {
     private static final String LOG_TAG = MyApp.APP_TAG + Recipe.class.getSimpleName();
 
     private int id;
-    private String shortDescription;
+    private String name;
     private String description;
     private String videoURL;
     private String thumbnailURL;
@@ -41,15 +41,15 @@ public class Step {
 
     /**
      * Constructor to initialize all the class fields from the parameters
-     * @param id               The step id
-     * @param shortDescription Step's short description
-     * @param description      Step's full description
-     * @param videoURL         The video
-     * @param thumbnailURL     A image thumbnail
+     * @param id            The step id
+     * @param name          Step's short description
+     * @param description   Step's full description
+     * @param videoURL      The video
+     * @param thumbnailURL  A image thumbnail
      */
-    public Step(int id, String shortDescription, String description, String videoURL, String thumbnailURL) {
+    public Step(int id, String name, String description, String videoURL, String thumbnailURL) {
         this.id = id;
-        this.shortDescription = shortDescription;
+        this.name = name;
         this.description = description;
         this.videoURL = videoURL;
         this.thumbnailURL = thumbnailURL;
@@ -63,12 +63,12 @@ public class Step {
         this.id = id;
     }
 
-    public String getShortDescription() {
-        return shortDescription;
+    public String getName() {
+        return name;
     }
 
-    public void setShortDescription(String shortDescription) {
-        this.shortDescription = shortDescription;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {

@@ -318,10 +318,10 @@ public class MainActivity extends AppCompatActivity
      * @param movieId the Id from the selected recipe
      */
     @Override
-    public void onClick(int adapterPosition) {
+    public void onClick(int recipeId) {
         /** Prepare to call the detail activity, to show the recipe's details */
         Intent intent = new Intent(this, RecipeActivity.class);
-        intent.putExtra(RecipeActivity.EXTRA_ARRAY_POS, adapterPosition);
+        intent.putExtra(RecipeActivity.EXTRA_ARRAY_POS, recipeId);
         startActivity(intent);
     }
 

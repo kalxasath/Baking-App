@@ -29,4 +29,8 @@
     <dimen name="ingredient_item_padding">5dp</dimen>
     <dimen name="ingredient_name_size">15sp</dimen>
     <dimen name="ingredient_quantity_size">12sp</dimen>
+
+    <dimen name="method_step_item_padding">5dp</dimen>
+    <dimen name="method_step_name_size">15sp</dimen>
+    <dimen name="method_description_size">12sp</dimen>
 </resources>

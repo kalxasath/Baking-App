@@ -62,7 +62,7 @@ public class IngredientsListAdapter
      */
     public class IngredientsAdapterViewHolder extends RecyclerView.ViewHolder {
 
-        /* layout bindings */
+        /** layout bindings */
         @BindView(R.id.ll_ingredient_row) LinearLayout mIngredientRow;
         @BindView(R.id.tv_name) TextView mName;
         @BindView(R.id.tv_quantity) TextView mQuantity;
