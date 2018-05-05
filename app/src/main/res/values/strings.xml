@@ -38,4 +38,8 @@
     <string name="ingredient_quantity">Quantity: %1$s %2$s</string>
 
     <string name="step_title">Step</string>
+
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="restart">Restart</string>
 </resources>

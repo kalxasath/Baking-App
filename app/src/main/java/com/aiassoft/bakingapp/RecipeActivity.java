@@ -195,7 +195,7 @@ public class RecipeActivity extends AppCompatActivity
         String err = this.getString(R.string.activity_error_message_missing_extras, RecipeActivity.class.getSimpleName());
         Log.e(LOG_TAG, err);
         Toast.makeText(this, err, Toast.LENGTH_LONG).show();
-        super.finish();
+        finish();
         //super.onBackPressed();
         // fragment getActivity().onBackPressed();
     }
