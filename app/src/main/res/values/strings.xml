@@ -29,11 +29,13 @@
     <string name="error_check_your_network_connectivity">Please check your network connectivity, and then click the button [Refresh]</string>
 
     <string name="recipe_title">Recipe</string>
-    <string name="recipe_activity_error_message">Missing Recipe Id on extra data</string>
+    <string name="activity_error_message_missing_extras">Missing extra data for activity %1$s</string>
     <string name="recipe_image_content_description">Recipe Image Content Description</string>
     <string name="recipe_servings">servings:</string>
     <string name="recipe_title_ingredients">Ingredients</string>
     <string name="recipe_title_method">Method</string>
 
     <string name="ingredient_quantity">Quantity: %1$s %2$s</string>
+
+    <string name="step_title">Step</string>
 </resources>

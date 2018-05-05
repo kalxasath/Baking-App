@@ -32,6 +32,16 @@
                 android:value=".MainActivity" />
         </activity>
 
+        <activity
+            android:name=".StepActivity"
+            android:parentActivityName=".RecipeActivity"
+            android:label="@string/step_title"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".RecipeActivity" />
+        </activity>
+
     </application>
 
 </manifest>

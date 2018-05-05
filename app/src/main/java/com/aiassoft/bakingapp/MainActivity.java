@@ -43,7 +43,6 @@ import com.google.gson.GsonBuilder;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -315,13 +314,13 @@ public class MainActivity extends AppCompatActivity
     /**
      * This method is for responding to clicks from our list.
      *
-     * @param movieId the Id from the selected recipe
+     * @param recipePosition the Position from the selected recipe
      */
     @Override
-    public void onClick(int recipeId) {
+    public void onClick(int recipePosition) {
         /** Prepare to call the detail activity, to show the recipe's details */
         Intent intent = new Intent(this, RecipeActivity.class);
-        intent.putExtra(RecipeActivity.EXTRA_ARRAY_POS, recipeId);
+        intent.putExtra(RecipeActivity.EXTRA_RECIPE_POS, recipePosition);
         startActivity(intent);
     }
 
