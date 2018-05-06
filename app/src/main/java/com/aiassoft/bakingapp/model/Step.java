@@ -79,11 +79,11 @@ public class Step {
         this.description = description;
     }
 
-    public String getVideoURL() { return videoURL; }
+    public String getVideoUrl() { return videoURL; }
 
     public void setVideoURL(String videoURL) { this.videoURL = videoURL; }
 
-    public String getThumbnailURL() { return thumbnailURL; }
+    public String getThumbnailUrl() { return thumbnailURL; }
 
     public void  setThumbnailURL(String thumbnailURL) { this.thumbnailURL = thumbnailURL; }
 

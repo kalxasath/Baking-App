@@ -19,22 +19,19 @@
 package com.aiassoft.bakingapp;
 
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.aiassoft.bakingapp.model.Recipe;
@@ -56,6 +53,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -93,7 +91,8 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     private static int mStepPos = DEFAULT_POS;
 
     private SimpleExoPlayer mExoPlayer;
-    @BindView(R.id.sepv_player_view) SimpleExoPlayerView mPlayerView;
+    @BindView(R.id.sepv_player) SimpleExoPlayerView mPlayer;
+    @BindView(R.id.iv_image) ImageView mThumbnail;
     private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
     private NotificationManager mNotificationManager;
@@ -108,7 +107,7 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
         super.onCreate(savedInstanceState);
         mContext = this;
 
-        setContentView(R.layout.activity_recipe);
+        setContentView(R.layout.activity_step);
         ButterKnife.bind(this);
 
 //        ActionBar actionBar = this.getSupportActionBar();
@@ -146,12 +145,37 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
         setTitle(mRecipe.getName());
 
-//        mPlayerView.setDefaultArtwork();
-        // Initialize the Media Session.
-        initializeMediaSession();
+        String videoUrl = mStep.getVideoUrl();
+        String thumbnailUrl = mStep.getThumbnailUrl();
 
-        // Initialize the player.
-        initializePlayer(Uri.parse(mStep.getVideoURL()));
+        if (! videoUrl.isEmpty()) {
+            mThumbnail.setVisibility(View.INVISIBLE);
+            mPlayer.setVisibility(View.VISIBLE);
+
+//        mPlayer.setDefaultArtwork();
+            // Initialize the Media Session.
+            initializeMediaSession();
+
+            // Initialize the player.
+            initializePlayer(Uri.parse(videoUrl));
+
+        } else {
+
+            mPlayer.setVisibility(View.INVISIBLE);
+            mThumbnail.setVisibility(View.VISIBLE);
+
+            if (!thumbnailUrl.isEmpty()) {
+                Picasso.with(this)
+                        .load(thumbnailUrl)
+                        .placeholder(R.drawable.no_video_available)
+                        .error(R.drawable.no_video_available)
+                        .into(mThumbnail);
+            } else {
+                Picasso.with(this)
+                        .load(R.drawable.no_video_available)
+                        .into(mThumbnail);
+            }
+        }
     }
 
     /**
@@ -249,7 +273,7 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
-            mPlayerView.setPlayer(mExoPlayer);
+            mPlayer.setPlayer(mExoPlayer);
 
             // Set the ExoPlayer.EventListener to this activity.
             mExoPlayer.addListener(this);
@@ -267,10 +291,13 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
      * Release ExoPlayer.
      */
     private void releasePlayer() {
-        mNotificationManager.cancelAll();
-        mExoPlayer.stop();
-        mExoPlayer.release();
-        mExoPlayer = null;
+        if (mNotificationManager != null)
+            mNotificationManager.cancelAll();
+        if (mExoPlayer != null) {
+            mExoPlayer.stop();
+            mExoPlayer.release();
+            mExoPlayer = null;
+        }
     }
 
     private void closeOnError() {
@@ -309,7 +336,8 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     protected void onDestroy() {
         super.onDestroy();
         releasePlayer();
-        mMediaSession.setActive(false);
+        if (mMediaSession != null)
+            mMediaSession.setActive(false);
     }
 
     /** ExoPlayer Event Listeners */
