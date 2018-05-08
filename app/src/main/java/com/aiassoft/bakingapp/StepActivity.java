@@ -18,6 +18,7 @@
 
 package com.aiassoft.bakingapp;
 
+import android.app.ActionBar;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -32,10 +33,12 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aiassoft.bakingapp.model.Recipe;
 import com.aiassoft.bakingapp.model.Step;
+import com.aiassoft.bakingapp.utilities.AppUtils;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -59,6 +62,11 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.aiassoft.bakingapp.utilities.AppUtils.hideSystemUI;
+import static com.aiassoft.bakingapp.utilities.AppUtils.inLandscape;
+import static com.aiassoft.bakingapp.utilities.AppUtils.showSystemUI;
+import static com.aiassoft.bakingapp.utilities.AppUtils.showToast;
 
 /**
  * Created by gvryn on 04/05/18.
@@ -93,6 +101,7 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     private SimpleExoPlayer mExoPlayer;
     @BindView(R.id.sepv_player) SimpleExoPlayerView mPlayer;
     @BindView(R.id.iv_image) ImageView mThumbnail;
+    @BindView(R.id.tv_recipe_step_instruction) TextView mRecipeStepInstruction;
     private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
     private NotificationManager mNotificationManager;
@@ -139,11 +148,41 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     }
 
     private void initializeActivity() {
+        if (AppUtils.isTablet()) {
+            showToast("in Tabled mode");
+        }
+
+        View decorView = getWindow().getDecorView();
+        ActionBar actionBar = getActionBar();
+
+        if (inLandscape()) {
+            //showToast("in Landscape mode");
+            hideSystemUI(this);
+//            // Hide the status bar.
+//            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+//            decorView.setSystemUiVisibility(uiOptions);
+//            // Remember that you should never show the action bar if the
+//            // status bar is hidden, so hide that too if necessary.
+//            if (actionBar != null)
+//                actionBar.hide();
+        } else {
+            showSystemUI(this);
+//            // Hide the status bar.
+//            int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
+//            decorView.setSystemUiVisibility(uiOptions);
+//            // Remember that you should never show the action bar if the
+//            // status bar is hidden, so hide that too if necessary.
+//            if (actionBar != null)
+//                actionBar.show();
+        }
+
         mRecipe = MyApp.mRecipesData.get(mRecipePos);
         mSteps = mRecipe.getSteps();
         mStep = mSteps.get(mStepPos);
 
         setTitle(mRecipe.getName());
+
+        mRecipeStepInstruction.setText(mStep.getDescription());
 
         String videoUrl = mStep.getVideoUrl();
         String thumbnailUrl = mStep.getThumbnailUrl();

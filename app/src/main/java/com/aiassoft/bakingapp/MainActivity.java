@@ -49,6 +49,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.widget.Toast.*;
+import static com.aiassoft.bakingapp.utilities.AppUtils.hideSystemUI;
 
 public class MainActivity extends AppCompatActivity
         implements RecipesListAdapter.RecipesAdapterOnClickHandler,
