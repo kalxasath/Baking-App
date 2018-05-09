@@ -28,10 +28,12 @@ import android.os.Bundle;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -99,9 +101,10 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     private static int mStepPos = DEFAULT_POS;
 
     private SimpleExoPlayer mExoPlayer;
-    @BindView(R.id.sepv_player) SimpleExoPlayerView mPlayer;
-    @BindView(R.id.iv_image) ImageView mThumbnail;
-    @BindView(R.id.tv_recipe_step_instruction) TextView mRecipeStepInstruction;
+    //@BindView(R.id.sepv_player) SimpleExoPlayerView mPlayer;
+    //@BindView(R.id.iv_image) ImageView mThumbnail;
+    //@BindView(R.id.tv_recipe_step_instruction) TextView mRecipeStepInstruction;
+    @BindView(R.id.vp_slide_area) ViewPager mSlideViewPager;
     private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
     private NotificationManager mNotificationManager;
@@ -147,6 +150,9 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
         }
     }
 
+
+    private SliderAdapter mSliderAdapter;
+
     private void initializeActivity() {
         if (AppUtils.isTablet()) {
             showToast("in Tabled mode");
@@ -182,6 +188,13 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
         setTitle(mRecipe.getName());
 
+        mSliderAdapter = new SliderAdapter(this);
+        mSliderAdapter.setMethodStepsData(mSteps);
+
+        mSlideViewPager.setAdapter(mSliderAdapter);
+
+
+        /**
         mRecipeStepInstruction.setText(mStep.getDescription());
 
         String videoUrl = mStep.getVideoUrl();
@@ -215,6 +228,7 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
                         .into(mThumbnail);
             }
         }
+        */
     }
 
     /**
@@ -312,7 +326,7 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
-            mPlayer.setPlayer(mExoPlayer);
+            //mPlayer.setPlayer(mExoPlayer);
 
             // Set the ExoPlayer.EventListener to this activity.
             mExoPlayer.addListener(this);
