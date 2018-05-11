@@ -41,6 +41,9 @@
 
     <color name="ingredientsOddLineBackgroundColor">#F1F7F7</color>
 
+    <color name="colorStepIndicator">#CCCCCC</color>
+    <color name="colorStepIndicatorCurrent">#FFFFFF</color>
+
     <color name="black">#000000</color>
     <color name="yellow">#FFFF00</color>
     <color name="red">#ff0000</color>

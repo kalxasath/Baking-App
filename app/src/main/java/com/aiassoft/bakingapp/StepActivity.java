@@ -30,11 +30,12 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewParent;
-import android.widget.ImageView;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,10 +56,8 @@ import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -105,9 +104,16 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     //@BindView(R.id.iv_image) ImageView mThumbnail;
     //@BindView(R.id.tv_recipe_step_instruction) TextView mRecipeStepInstruction;
     @BindView(R.id.vp_slide_area) ViewPager mSlideViewPager;
+    @BindView(R.id.ll_dot_area) LinearLayout mDotArea;
+    @BindView(R.id.bt_prev) Button mBtnPrev;
+    @BindView(R.id.bt_next) Button mBtnNext;
     private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
     private NotificationManager mNotificationManager;
+
+    private SliderAdapter mSliderAdapter;
+    private TextView[] mDots;
+    private int mCurrentPage = 0;
 
     /**
      * Creates the step activity
@@ -151,8 +157,6 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     }
 
 
-    private SliderAdapter mSliderAdapter;
-
     private void initializeActivity() {
         if (AppUtils.isTablet()) {
             showToast("in Tabled mode");
@@ -188,11 +192,14 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
         setTitle(mRecipe.getName());
 
+        addDotsIndicator(mSteps.size(), 0);
+
         mSliderAdapter = new SliderAdapter(this);
         mSliderAdapter.setMethodStepsData(mSteps);
 
         mSlideViewPager.setAdapter(mSliderAdapter);
 
+        mSlideViewPager.addOnPageChangeListener(viewPagerOnPageChangeListener);
 
         /**
         mRecipeStepInstruction.setText(mStep.getDescription());
@@ -230,6 +237,57 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
         }
         */
     }
+
+    private void addDotsIndicator(int steps, int position) {
+        mDots = new TextView[steps];
+        mDotArea.removeAllViews();
+
+        for (int i = 0; i < steps; i++) {
+            mDots[i] = new TextView(this);
+            mDots[i].setText(Html.fromHtml("&#8226;"));
+            mDots[i].setTextSize(35);
+            mDots[i].setTextColor(getResources().getColor(R.color.colorStepIndicator));
+
+            mDotArea.addView(mDots[i]);
+        }
+
+        if (steps > 0) {
+            mDots[position].setTextColor(getResources().getColor(R.color.colorStepIndicatorCurrent));
+        }
+
+        mCurrentPage = position;
+
+        if(mCurrentPage == 0) {
+            mBtnNext.setEnabled(true);
+            mBtnPrev.setEnabled(false);
+            //mBtnPrev.setVisibility(View.INVISIBLE);
+        } else if (mCurrentPage == steps-1) {
+            mBtnNext.setEnabled(false);
+            mBtnPrev.setEnabled(true);
+        } else {
+            mBtnNext.setEnabled(true);
+            mBtnPrev.setEnabled(true);
+        }
+    }
+
+    ViewPager.OnPageChangeListener viewPagerOnPageChangeListener = new ViewPager.OnPageChangeListener() {
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+          addDotsIndicator(mSteps.size(), position);
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
+    };
+
 
     /**
      * Initializes the Media Session to be enabled with media buttons, transport controls, callbacks
