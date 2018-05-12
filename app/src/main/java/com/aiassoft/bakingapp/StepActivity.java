@@ -73,7 +73,7 @@ import static com.aiassoft.bakingapp.utilities.AppUtils.showToast;
  * Created by gvryn on 04/05/18.
  */
 
-public class StepActivity extends AppCompatActivity implements ExoPlayer.EventListener {
+public class StepActivity extends AppCompatActivity implements ExoPlayer.EventListener, View.OnClickListener {
 
     private static final String LOG_TAG = MyApp.APP_TAG + StepActivity.class.getSimpleName();
 
@@ -113,7 +113,7 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
     private SliderAdapter mSliderAdapter;
     private TextView[] mDots;
-    private int mCurrentPage = 0;
+    private int mPrevPage = 0;
 
     /**
      * Creates the step activity
@@ -154,8 +154,10 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
         } else {
             initializeActivity();
         }
-    }
 
+        mBtnPrev.setOnClickListener(this);
+        mBtnNext.setOnClickListener(this);
+    }
 
     private void initializeActivity() {
         if (AppUtils.isTablet()) {
@@ -192,7 +194,9 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
         setTitle(mRecipe.getName());
 
-        addDotsIndicator(mSteps.size(), 0);
+        addDotsIndicator(mSteps.size());
+        //setPageIndicators(mSteps.size(), 0);
+
 
         mSliderAdapter = new SliderAdapter(this);
         mSliderAdapter.setMethodStepsData(mSteps);
@@ -201,6 +205,8 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
         mSlideViewPager.addOnPageChangeListener(viewPagerOnPageChangeListener);
 
+
+        mSlideViewPager.setCurrentItem(mStepPos);
         /**
         mRecipeStepInstruction.setText(mStep.getDescription());
 
@@ -238,11 +244,11 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
         */
     }
 
-    private void addDotsIndicator(int steps, int position) {
-        mDots = new TextView[steps];
+    private void addDotsIndicator(int pages) {
+        mDots = new TextView[pages];
         mDotArea.removeAllViews();
 
-        for (int i = 0; i < steps; i++) {
+        for (int i = 0; i < pages; i++) {
             mDots[i] = new TextView(this);
             mDots[i].setText(Html.fromHtml("&#8226;"));
             mDots[i].setTextSize(35);
@@ -250,24 +256,31 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
             mDotArea.addView(mDots[i]);
         }
+    }
 
-        if (steps > 0) {
-            mDots[position].setTextColor(getResources().getColor(R.color.colorStepIndicatorCurrent));
-        }
+    private void setPageIndicators(int pages, int page) {
+        mDots[mPrevPage].setTextColor(getResources().getColor(R.color.colorStepIndicator));
+        mDots[page].setTextColor(getResources().getColor(R.color.colorStepIndicatorCurrent));
+        mPrevPage = page;
 
-        mCurrentPage = position;
-
-        if(mCurrentPage == 0) {
+        if(page == 0) {
             mBtnNext.setEnabled(true);
             mBtnPrev.setEnabled(false);
-            //mBtnPrev.setVisibility(View.INVISIBLE);
-        } else if (mCurrentPage == steps-1) {
+            mBtnPrev.setText("");
+        } else if (page == pages-1) {
             mBtnNext.setEnabled(false);
+            mBtnNext.setText("");
             mBtnPrev.setEnabled(true);
         } else {
             mBtnNext.setEnabled(true);
             mBtnPrev.setEnabled(true);
+            mBtnNext.setText(getResources().getString(R.string.next));
+            mBtnPrev.setText(getResources().getString(R.string.prev));
         }
+    }
+
+    private void initializePage(int page) {
+        setPageIndicators(mSteps.size(), page);
     }
 
     ViewPager.OnPageChangeListener viewPagerOnPageChangeListener = new ViewPager.OnPageChangeListener() {
@@ -278,8 +291,8 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
         }
 
         @Override
-        public void onPageSelected(int position) {
-          addDotsIndicator(mSteps.size(), position);
+        public void onPageSelected(int page) {
+            initializePage(page);
         }
 
         @Override
@@ -491,6 +504,20 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
     @Override
     public void onPositionDiscontinuity() {
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+
+        switch (id) {
+            case R.id.bt_prev:
+                mSlideViewPager.setCurrentItem(mSlideViewPager.getCurrentItem()-1);
+                break;
+            case R.id.bt_next:
+                mSlideViewPager.setCurrentItem(mSlideViewPager.getCurrentItem()+1);
+                break;
+        }
     }
 
     /**
