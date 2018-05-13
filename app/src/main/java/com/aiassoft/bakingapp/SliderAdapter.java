@@ -1,32 +1,16 @@
 package com.aiassoft.bakingapp;
 
 import android.content.Context;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.aiassoft.bakingapp.model.Step;
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.LoadControl;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,9 +30,6 @@ public class SliderAdapter extends PagerAdapter {
     /* This array holds a list of Method Steps objects */
     private ArrayList<Step> mMethodStepsData = new ArrayList<>();
 
-    private SimpleExoPlayer mExoPlayer;
-    @BindView(R.id.sepv_player) SimpleExoPlayerView mPlayer;
-    @BindView(R.id.iv_image) ImageView mThumbnail;
     @BindView(R.id.tv_recipe_step_instruction) TextView mRecipeStepInstruction;
 
     public SliderAdapter(Context context) {
@@ -63,10 +44,8 @@ public class SliderAdapter extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
-        return view == (LinearLayout) object;
+        return view == object;
     }
-
-
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
@@ -78,6 +57,8 @@ public class SliderAdapter extends PagerAdapter {
 
         mRecipeStepInstruction.setText(mMethodStepsData.get(position).getDescription());
 
+        Log.d("SliderAdapter", "instantiateItem at: " + position + ", o:"+ view.toString());
+
         container.addView(view);
 
         return view;
@@ -85,6 +66,7 @@ public class SliderAdapter extends PagerAdapter {
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
+        Log.d("SliderAdapter", "destroyItem at: " + position + ", o:"+ object.toString());
         container.removeView((LinearLayout) object);
     }
 

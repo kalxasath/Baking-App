@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aiassoft.bakingapp.model.Recipe;
+import com.aiassoft.bakingapp.utilities.AppUtils;
 import com.aiassoft.bakingapp.utilities.JsonUtils;
 import com.aiassoft.bakingapp.utilities.NetworkUtils;
 
@@ -94,7 +95,12 @@ public class MainActivity extends AppCompatActivity
          * The gridLayoutManager is responsible for measuring and positioning item views within a
          * RecyclerView into a grid.
          */
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
+        GridLayoutManager gridLayoutManager;
+        if (AppUtils.isTablet()) {
+            gridLayoutManager = new GridLayoutManager(this, 3);
+        } else {
+            gridLayoutManager = new GridLayoutManager(this, 1);
+        }
 
         /* setLayoutManager associates the gridLayoutManager with our RecyclerView */
         mRecyclerView.setLayoutManager(gridLayoutManager);
@@ -276,6 +282,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<List<Recipe>> loader, List<Recipe> data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
+
+        /** reset previously loaded data, if*/
+        mRecipesListAdapter.invalidateData();
 
         /** Update the adapters data with the new one */
         mRecipesListAdapter.setRecipesData(data);

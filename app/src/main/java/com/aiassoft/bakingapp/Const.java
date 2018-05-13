@@ -33,7 +33,7 @@ public class Const {
     /**
      * Set to TRUE if you want to multiply the recipes
      */
-    public static final boolean MULTIPLY_THE_RECIPES = true;
+    public static final boolean MULTIPLY_THE_RECIPES = false;
     /**
      *  large multiplier increases the starting time because all the recipes are pictureless
      *  and the find picture procedure is not optimized

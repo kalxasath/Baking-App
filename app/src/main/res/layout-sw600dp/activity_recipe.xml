@@ -46,48 +46,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/recipe_title_ingredients" />
 
-            <ImageView
-                android:id="@+id/iv_ingredients_separator"
-                android:layout_width="match_parent"
-                android:layout_height="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:src="@drawable/dotted_line"
-                android:layerType="software" />
-
-            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/ingredientsLayout"
-                >
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:descendantFocusability="blocksDescendants">
-
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/rv_ingredients"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                         />
-
-                </RelativeLayout>
-
-            </LinearLayout>
-
-
-            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                style="@style/seratedPageBottom"
-                android:orientation="vertical"
-                 />
-
-
             <!-- The Method Steps content -->
             <TextView
                 android:id="@+id/tv_method_steps_title"

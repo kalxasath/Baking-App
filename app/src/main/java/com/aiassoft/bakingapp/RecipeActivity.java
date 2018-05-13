@@ -148,24 +148,26 @@ public class RecipeActivity extends AppCompatActivity
 
         setTitle(mRecipe.getName());
 
-        /**
-         *  Initialize Ingredients Section
-         */
-        LinearLayoutManager linearLayoutVideoManager
-                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        if (! MyApp.isTablet) {
+            /**
+             *  Initialize Ingredients Section
+             */
+            LinearLayoutManager linearLayoutVideoManager
+                    = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-        mIngredientsRecyclerView.setLayoutManager(linearLayoutVideoManager);
-        mIngredientsRecyclerView.setHasFixedSize(false);
+            mIngredientsRecyclerView.setLayoutManager(linearLayoutVideoManager);
+            mIngredientsRecyclerView.setHasFixedSize(false);
 
-        /**
-         * The mRecipeListAdapter is responsible for linking our recipe's videos data with the Views that
-         * will end up displaying our videos' data.
-         */
-        mIngredientsListAdapter = new IngredientsListAdapter();
+            /**
+             * The mRecipeListAdapter is responsible for linking our recipe's videos data with the Views that
+             * will end up displaying our videos' data.
+             */
+            mIngredientsListAdapter = new IngredientsListAdapter();
 
         /* Setting the adapter attaches it to the RecyclerView in our layout. */
-        mIngredientsRecyclerView.setAdapter(mIngredientsListAdapter);
-        //mIngredientsRecyclerView.setNestedScrollingEnabled(false);
+            mIngredientsRecyclerView.setAdapter(mIngredientsListAdapter);
+            //mIngredientsRecyclerView.setNestedScrollingEnabled(false);
+        }
 
         /**
          *  Initialize Method Steps Section
@@ -187,7 +189,8 @@ public class RecipeActivity extends AppCompatActivity
     }
 
     private void populateRecipeData() {
-        mIngredientsListAdapter.setIngredientsData(mRecipe.getIngredients());
+        if (!MyApp.isTablet)
+            mIngredientsListAdapter.setIngredientsData(mRecipe.getIngredients());
         mMethodStepsListAdapter.setMethodStepsData(mRecipe.getSteps());
     }
 

@@ -35,6 +35,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,8 +57,10 @@ import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -95,14 +98,12 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     private static Context mContext = null;
     private static Recipe mRecipe = null;
     private static List<Step> mSteps = null;
-    private static Step mStep = null;
     private static int mRecipePos = DEFAULT_POS;
     private static int mStepPos = DEFAULT_POS;
 
     private SimpleExoPlayer mExoPlayer;
-    //@BindView(R.id.sepv_player) SimpleExoPlayerView mPlayer;
-    //@BindView(R.id.iv_image) ImageView mThumbnail;
-    //@BindView(R.id.tv_recipe_step_instruction) TextView mRecipeStepInstruction;
+    @BindView(R.id.sepv_player) SimpleExoPlayerView mPlayer;
+    @BindView(R.id.iv_image) ImageView mThumbnail;
     @BindView(R.id.vp_slide_area) ViewPager mSlideViewPager;
     @BindView(R.id.ll_dot_area) LinearLayout mDotArea;
     @BindView(R.id.bt_prev) Button mBtnPrev;
@@ -114,6 +115,9 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     private SliderAdapter mSliderAdapter;
     private TextView[] mDots;
     private int mPrevPage = 0;
+
+
+
 
     /**
      * Creates the step activity
@@ -127,11 +131,6 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
         setContentView(R.layout.activity_step);
         ButterKnife.bind(this);
-
-//        ActionBar actionBar = this.getSupportActionBar();
-//        if (actionBar != null) {
-//            actionBar.setDisplayHomeAsUpEnabled(true);
-//        }
 
         /** should be called from another activity. if not, show error toast and return */
         Intent intent = getIntent();
@@ -164,41 +163,21 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
             showToast("in Tabled mode");
         }
 
-        View decorView = getWindow().getDecorView();
-        ActionBar actionBar = getActionBar();
-
         if (inLandscape()) {
-            //showToast("in Landscape mode");
             hideSystemUI(this);
-//            // Hide the status bar.
-//            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-//            decorView.setSystemUiVisibility(uiOptions);
-//            // Remember that you should never show the action bar if the
-//            // status bar is hidden, so hide that too if necessary.
-//            if (actionBar != null)
-//                actionBar.hide();
         } else {
             showSystemUI(this);
-//            // Hide the status bar.
-//            int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
-//            decorView.setSystemUiVisibility(uiOptions);
-//            // Remember that you should never show the action bar if the
-//            // status bar is hidden, so hide that too if necessary.
-//            if (actionBar != null)
-//                actionBar.show();
         }
 
         mRecipe = MyApp.mRecipesData.get(mRecipePos);
         mSteps = mRecipe.getSteps();
-        mStep = mSteps.get(mStepPos);
 
         setTitle(mRecipe.getName());
 
         addDotsIndicator(mSteps.size());
-        //setPageIndicators(mSteps.size(), 0);
-
 
         mSliderAdapter = new SliderAdapter(this);
+        mSliderAdapter.invalidateData();
         mSliderAdapter.setMethodStepsData(mSteps);
 
         mSlideViewPager.setAdapter(mSliderAdapter);
@@ -206,10 +185,15 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
         mSlideViewPager.addOnPageChangeListener(viewPagerOnPageChangeListener);
 
 
-        mSlideViewPager.setCurrentItem(mStepPos);
-        /**
-        mRecipeStepInstruction.setText(mStep.getDescription());
+        initializeMediaSession();
 
+        mSlideViewPager.setCurrentItem(mStepPos);
+
+//        displayMedia(mSteps.get(mStepPos));
+        setPageIndicator(mSteps.size(), mStepPos);
+    }
+
+    private void displayMedia(Step mStep) {
         String videoUrl = mStep.getVideoUrl();
         String thumbnailUrl = mStep.getThumbnailUrl();
 
@@ -217,7 +201,6 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
             mThumbnail.setVisibility(View.INVISIBLE);
             mPlayer.setVisibility(View.VISIBLE);
 
-//        mPlayer.setDefaultArtwork();
             // Initialize the Media Session.
             initializeMediaSession();
 
@@ -241,7 +224,6 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
                         .into(mThumbnail);
             }
         }
-        */
     }
 
     private void addDotsIndicator(int pages) {
@@ -258,7 +240,7 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
         }
     }
 
-    private void setPageIndicators(int pages, int page) {
+    private void setPageIndicator(int pages, int page) {
         mDots[mPrevPage].setTextColor(getResources().getColor(R.color.colorStepIndicator));
         mDots[page].setTextColor(getResources().getColor(R.color.colorStepIndicatorCurrent));
         mPrevPage = page;
@@ -277,10 +259,13 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
             mBtnNext.setText(getResources().getString(R.string.next));
             mBtnPrev.setText(getResources().getString(R.string.prev));
         }
+
+        releasePlayer();
+        displayMedia(mSteps.get(page));
     }
 
     private void initializePage(int page) {
-        setPageIndicators(mSteps.size(), page);
+        setPageIndicator(mSteps.size(), page);
     }
 
     ViewPager.OnPageChangeListener viewPagerOnPageChangeListener = new ViewPager.OnPageChangeListener() {
@@ -397,7 +382,7 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
-            //mPlayer.setPlayer(mExoPlayer);
+            mPlayer.setPlayer(mExoPlayer);
 
             // Set the ExoPlayer.EventListener to this activity.
             mExoPlayer.addListener(this);
@@ -415,8 +400,8 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
      * Release ExoPlayer.
      */
     private void releasePlayer() {
-        if (mNotificationManager != null)
-            mNotificationManager.cancelAll();
+//        if (mNotificationManager != null)
+//            mNotificationManager.cancelAll();
         if (mExoPlayer != null) {
             mExoPlayer.stop();
             mExoPlayer.release();

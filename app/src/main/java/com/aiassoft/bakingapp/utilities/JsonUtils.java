@@ -58,7 +58,7 @@ public class JsonUtils {
      * @return     The ArrayList of Recipe objects
      */
     public static List<Recipe> parseRecipesListJson(String json) {
-        Log.d(LOG_TAG, json);
+        //Log.d(LOG_TAG, json);
 
         /** ArrayList to hold the recipes list items */
         List<Recipe> returnRecipeListItems = new ArrayList<>();

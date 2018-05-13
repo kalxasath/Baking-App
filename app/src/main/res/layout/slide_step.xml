@@ -25,40 +25,16 @@
     android:layout_height="match_parent"
     android:layout_marginEnd="10dp"
     android:layout_marginStart="10dp"
-    android:layout_marginTop="10dp"
+    android:paddingTop="10dp"
+    android:gravity="top"
     android:orientation="vertical"
-    android:paddingTop="?attr/actionBarSize"
     tools:context="com.aiassoft.bakingapp.StepActivity">
 
-
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
-
-        <com.google.android.exoplayer2.ui.SimpleExoPlayerView
-            android:id="@+id/sepv_player"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_margin="0dp"
-            android:visibility="invisible" />
-
-        <ImageView
-            android:id="@+id/iv_image"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_margin="0dp"
-            android:adjustViewBounds="true"
-            android:scaleType="centerCrop" />
-
-    </FrameLayout>
 
     <TextView
         android:id="@+id/tv_recipe_step_instruction"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/method_step_item_padding"
         android:text="Method Step Name"
         android:textColor="@color/textTitle"
         android:textSize="@dimen/method_step_name_size" />

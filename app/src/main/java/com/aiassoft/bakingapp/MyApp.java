@@ -25,6 +25,7 @@ import android.content.res.Configuration;
 import android.view.View;
 
 import com.aiassoft.bakingapp.model.Recipe;
+import com.aiassoft.bakingapp.utilities.AppUtils;
 
 import java.util.ArrayList;
 
@@ -42,11 +43,15 @@ public class MyApp extends Application {
     /* This array holds a list of recipe objects */
     public static ArrayList<Recipe> mRecipesData = new ArrayList<>();
 
+    /** The table wont change to phone and via versa, so here a little speed up */
+    public static boolean isTablet;
+
 
     /**
      * Initialize the static resources
      */
     public static void initResources() {
+        isTablet = AppUtils.isTablet();;
     }
 
     /**
