@@ -86,9 +86,19 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     public static final String EXTRA_RECIPE_POS = "recipe_pos";
 
     /**
+     * Identifies the save instance parameter of the recipe pos
+     */
+    public static final String STATE_RECIPE_POS = "array_pos";
+
+    /**
      * Identifies the incoming parameter of the step pos
      */
     public static final String EXTRA_STEP_POS = "step_pos";
+
+    /**
+     * Identifies the save instance parameter of the step pos
+     */
+    public static final String STATE_STEP_POS = "step_pos";
 
     /**
      * If there is not a pos, this pos will as the default one
@@ -104,10 +114,11 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     private SimpleExoPlayer mExoPlayer;
     @BindView(R.id.sepv_player) SimpleExoPlayerView mPlayer;
     @BindView(R.id.iv_image) ImageView mThumbnail;
-    @BindView(R.id.vp_slide_area) ViewPager mSlideViewPager;
-    @BindView(R.id.ll_dot_area) LinearLayout mDotArea;
-    @BindView(R.id.bt_prev) Button mBtnPrev;
-    @BindView(R.id.bt_next) Button mBtnNext;
+    ViewPager mSlideViewPager;
+    LinearLayout mDotArea;
+    Button mBtnPrev;
+    Button mBtnNext;
+
     private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
     private NotificationManager mNotificationManager;
@@ -132,19 +143,25 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
         setContentView(R.layout.activity_step);
         ButterKnife.bind(this);
 
-        /** should be called from another activity. if not, show error toast and return */
-        Intent intent = getIntent();
-        if (intent == null) {
-            closeOnError();
-        } else {
+        // recovering the instance state
+        if (savedInstanceState != null) {
 
-            /**
-             * should be called from another activity. if not, show error toast and return
-             * Actually closeOnError doesn't stop the code workflow and we get the error
-             * ArrayIndexOutOfBoundsException
-             */
-            mRecipePos = intent.getIntExtra(EXTRA_RECIPE_POS, DEFAULT_POS);
-            mStepPos = intent.getIntExtra(EXTRA_STEP_POS, DEFAULT_POS);
+            mRecipePos = savedInstanceState.getInt(STATE_RECIPE_POS, DEFAULT_POS);
+            mStepPos = savedInstanceState.getInt(STATE_STEP_POS, DEFAULT_POS);
+
+        } else {
+            /** should be called from another activity. if not, show error toast and return */
+            Intent intent = getIntent();
+            if (intent == null) {
+                closeOnError();
+            } else {
+
+                /**
+                 * should be called from another activity. if not, show error toast and return
+                 */
+                mRecipePos = intent.getIntExtra(EXTRA_RECIPE_POS, DEFAULT_POS);
+                mStepPos = intent.getIntExtra(EXTRA_STEP_POS, DEFAULT_POS);
+            }
         }
 
         if (mRecipePos == DEFAULT_POS || mStepPos == DEFAULT_POS) {
@@ -153,9 +170,31 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
         } else {
             initializeActivity();
         }
+    }
 
-        mBtnPrev.setOnClickListener(this);
-        mBtnNext.setOnClickListener(this);
+    /**
+     * https://developer.android.com/guide/components/activities/activity-lifecycle#saras
+     *
+     * This callback is called only when there is a saved instance that is previously saved by using
+     * onSaveInstanceState(). We restore some state in onCreate(), while we can optionally restore
+     * other state here, possibly usable after onStart() has completed.
+     * The savedInstanceState Bundle is same as the one used in onCreate().
+     * @param savedInstanceState
+     */
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, " :: onRestoreInstanceState");
+    }
+
+    /** invoked when the activity may be temporarily destroyed, save the instance state here */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d(LOG_TAG, " :: onSaveInstanceState");
+        outState.putInt(STATE_RECIPE_POS, mRecipePos);
+        outState.putInt(STATE_STEP_POS, mStepPos);
+
+        // call superclass to save any view hierarchy
+        super.onSaveInstanceState(outState);
     }
 
     private void initializeActivity() {
@@ -163,34 +202,45 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
             showToast("in Tabled mode");
         }
 
-        if (inLandscape()) {
-            hideSystemUI(this);
-        } else {
-            showSystemUI(this);
-        }
-
         mRecipe = MyApp.mRecipesData.get(mRecipePos);
         mSteps = mRecipe.getSteps();
 
         setTitle(mRecipe.getName());
 
-        addDotsIndicator(mSteps.size());
-
-        mSliderAdapter = new SliderAdapter(this);
-        mSliderAdapter.invalidateData();
-        mSliderAdapter.setMethodStepsData(mSteps);
-
-        mSlideViewPager.setAdapter(mSliderAdapter);
-
-        mSlideViewPager.addOnPageChangeListener(viewPagerOnPageChangeListener);
-
-
         initializeMediaSession();
 
-        mSlideViewPager.setCurrentItem(mStepPos);
+        if (inLandscape()) {
 
-//        displayMedia(mSteps.get(mStepPos));
-        setPageIndicator(mSteps.size(), mStepPos);
+            hideSystemUI(this);
+
+            displayMedia(mSteps.get(mStepPos));
+
+        } else {
+
+            showSystemUI(this);
+
+            mSlideViewPager = this.findViewById(R.id.vp_slide_area);
+            mDotArea = this.findViewById(R.id.ll_dot_area);
+            mBtnPrev = this.findViewById(R.id.bt_prev);
+            mBtnNext = this.findViewById(R.id.bt_next);
+
+            addDotsIndicator(mSteps.size());
+
+            mSliderAdapter = new SliderAdapter(this);
+            mSliderAdapter.invalidateData();
+            mSliderAdapter.setMethodStepsData(mSteps);
+
+            mSlideViewPager.setAdapter(mSliderAdapter);
+
+            mSlideViewPager.addOnPageChangeListener(viewPagerOnPageChangeListener);
+
+            mSlideViewPager.setCurrentItem(mStepPos);
+
+            setPageIndicator(mSteps.size(), mStepPos);
+
+            mBtnPrev.setOnClickListener(this);
+            mBtnNext.setOnClickListener(this);
+        }
     }
 
     private void displayMedia(Step mStep) {

@@ -96,8 +96,6 @@ public class RecipeActivity extends AppCompatActivity
 
             /**
              * should be called from another activity. if not, show error toast and return
-             * Actually closeOnError doesn't stop the code workflow and we get the error
-             * ArrayIndexOutOfBoundsException
              */
             Intent intent = getIntent();
             if (intent == null) {
