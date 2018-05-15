@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.aiassoft.bakingapp;
+package com.aiassoft.bakingapp.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -26,8 +26,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.aiassoft.bakingapp.MyApp;
+import com.aiassoft.bakingapp.R;
 import com.aiassoft.bakingapp.model.Recipe;
-import com.aiassoft.bakingapp.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

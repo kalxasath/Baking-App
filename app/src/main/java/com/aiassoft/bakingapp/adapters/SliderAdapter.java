@@ -1,4 +1,4 @@
-package com.aiassoft.bakingapp;
+package com.aiassoft.bakingapp.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.aiassoft.bakingapp.R;
 import com.aiassoft.bakingapp.model.Step;
 
 import java.util.ArrayList;

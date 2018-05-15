@@ -16,18 +16,27 @@
  * limitations under the License.
  */
 
-package com.aiassoft.bakingapp;
+package com.aiassoft.bakingapp.activities;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aiassoft.bakingapp.adapters.IngredientsListAdapter;
+import com.aiassoft.bakingapp.adapters.MethodStepsListAdapter;
+import com.aiassoft.bakingapp.MyApp;
+import com.aiassoft.bakingapp.R;
+import com.aiassoft.bakingapp.fragments.IngredientsFragment;
+import com.aiassoft.bakingapp.fragments.MethodStepFragment;
 import com.aiassoft.bakingapp.model.Recipe;
 
 import butterknife.BindView;
@@ -38,7 +47,7 @@ import butterknife.ButterKnife;
  */
 
 public class RecipeActivity extends AppCompatActivity
-        implements MethodStepsListAdapter.MethodStepsAdapterOnClickHandler {
+        implements MethodStepsListAdapter.MethodStepsAdapterOnClickHandler, View.OnClickListener {
 
     private static final String LOG_TAG = MyApp.APP_TAG + RecipeActivity.class.getSimpleName();
 
@@ -57,6 +66,9 @@ public class RecipeActivity extends AppCompatActivity
      */
     private static final int DEFAULT_POS = -1;
 
+    private MethodStepFragment mMethodStepFragment;
+    private IngredientsFragment mIngredientsFragment;
+
     private static Context mContext = null;
     private static Recipe mRecipe = null;
     private static int mRecipePos = DEFAULT_POS;
@@ -69,10 +81,14 @@ public class RecipeActivity extends AppCompatActivity
 
     /** The views in the xml file */
     /** The Ingredients recycler view */
-    @BindView(R.id.rv_ingredients) RecyclerView mIngredientsRecyclerView;
+    //@BindView(R.id.rv_ingredients) RecyclerView mIngredientsRecyclerView;
+    RecyclerView mIngredientsRecyclerView;
 
     /** The Method Steps recycler view */
     @BindView(R.id.rv_method_steps) RecyclerView mMethodStepsRecyclerView;
+
+    /** The ingredients Title */
+    @BindView(R.id.tv_ingredients_title) TextView mIngredientsTitle;
 
     /**
      * Creates the recipe activity
@@ -146,10 +162,19 @@ public class RecipeActivity extends AppCompatActivity
 
         setTitle(mRecipe.getName());
 
-        if (! MyApp.isTablet) {
+        if (MyApp.isTablet) {
+            /** Add a click listener to the mIngredientsTitle to show the Ingredients in the Fragment */
+            mIngredientsTitle.setOnClickListener(this);
+
+            addIngredientsFragment();
+
+        } else {
             /**
              *  Initialize Ingredients Section
              */
+
+            mIngredientsRecyclerView = this.findViewById(R.id.rv_ingredients);
+
             LinearLayoutManager linearLayoutVideoManager
                     = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
@@ -162,7 +187,7 @@ public class RecipeActivity extends AppCompatActivity
              */
             mIngredientsListAdapter = new IngredientsListAdapter();
 
-        /* Setting the adapter attaches it to the RecyclerView in our layout. */
+            /** Setting the adapter attaches it to the RecyclerView in our layout. */
             mIngredientsRecyclerView.setAdapter(mIngredientsListAdapter);
             //mIngredientsRecyclerView.setNestedScrollingEnabled(false);
         }
@@ -186,9 +211,38 @@ public class RecipeActivity extends AppCompatActivity
         mMethodStepsRecyclerView.setAdapter(mMethodStepsListAdapter);
     }
 
+    private void addMethodStepFragment() {
+        /** Create a new MethodStepFragment to display it using the FragmentManager */
+        mMethodStepFragment = new MethodStepFragment();
+
+        /** Use a FragmentManager and Transaction to add the fragment to the screen */
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        /** the Fragment transaction */
+        fragmentManager.beginTransaction()
+                .replace(R.id.ll_fragment_container, mMethodStepFragment)
+                .commit();
+    }
+
+    private void addIngredientsFragment() {
+        /** Create a new MethodStepFragment to display it using the FragmentManager */
+        mIngredientsFragment = new IngredientsFragment();
+
+        /** Use a FragmentManager and Transaction to add the fragment to the screen */
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        /** the Fragment transaction */
+        fragmentManager.beginTransaction()
+                .replace(R.id.ll_fragment_container, mIngredientsFragment)
+                .commit();
+    }
+
     private void populateRecipeData() {
-        if (!MyApp.isTablet)
+        if (!MyApp.isTablet) {
+            mIngredientsListAdapter.invalidateData();
             mIngredientsListAdapter.setIngredientsData(mRecipe.getIngredients());
+        }
+        mMethodStepsListAdapter.invalidateData();
         mMethodStepsListAdapter.setMethodStepsData(mRecipe.getSteps());
     }
 
@@ -209,11 +263,17 @@ public class RecipeActivity extends AppCompatActivity
      */
     @Override
     public void onClick(int stepPosition) {
-        /** Prepare to call the step activity, to show the step's details */
-        Intent intent = new Intent(this, StepActivity.class);
-        intent.putExtra(StepActivity.EXTRA_RECIPE_POS, mRecipePos);
-        intent.putExtra(StepActivity.EXTRA_STEP_POS, stepPosition);
-        startActivity(intent);
+        if (MyApp.isTablet) {
+            Toast.makeText(this, "Step: " + stepPosition, Toast.LENGTH_SHORT).show();
+            addMethodStepFragment();
+
+        } else {
+            /** Prepare to call the step activity, to show the step's details */
+            Intent intent = new Intent(this, StepActivity.class);
+            intent.putExtra(StepActivity.EXTRA_RECIPE_POS, mRecipePos);
+            intent.putExtra(StepActivity.EXTRA_STEP_POS, stepPosition);
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -224,5 +284,11 @@ public class RecipeActivity extends AppCompatActivity
         }
 
         return true;
+    }
+
+    @Override
+    public void onClick(View v) {
+        Toast.makeText(this, "Click from: " + v.getTag().toString(), Toast.LENGTH_SHORT).show();
+        addIngredientsFragment();
     }
 }

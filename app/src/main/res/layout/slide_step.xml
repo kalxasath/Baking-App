@@ -28,7 +28,7 @@
     android:paddingTop="10dp"
     android:gravity="top"
     android:orientation="vertical"
-    tools:context="com.aiassoft.bakingapp.StepActivity">
+    tools:context="com.aiassoft.bakingapp.activities.StepActivity">
 
 
     <TextView

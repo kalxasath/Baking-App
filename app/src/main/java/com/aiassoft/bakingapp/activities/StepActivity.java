@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package com.aiassoft.bakingapp;
+package com.aiassoft.bakingapp.activities;
 
-import android.app.ActionBar;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -40,6 +39,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aiassoft.bakingapp.MyApp;
+import com.aiassoft.bakingapp.R;
+import com.aiassoft.bakingapp.adapters.SliderAdapter;
 import com.aiassoft.bakingapp.model.Recipe;
 import com.aiassoft.bakingapp.model.Step;
 import com.aiassoft.bakingapp.utilities.AppUtils;

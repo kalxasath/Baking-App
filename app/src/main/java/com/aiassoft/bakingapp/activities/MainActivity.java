@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.aiassoft.bakingapp;
+package com.aiassoft.bakingapp.activities;
 
 import android.content.Intent;
 import android.support.v4.app.LoaderManager;
@@ -34,6 +34,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aiassoft.bakingapp.Const;
+import com.aiassoft.bakingapp.MyApp;
+import com.aiassoft.bakingapp.R;
+import com.aiassoft.bakingapp.adapters.RecipesListAdapter;
 import com.aiassoft.bakingapp.model.Recipe;
 import com.aiassoft.bakingapp.utilities.AppUtils;
 import com.aiassoft.bakingapp.utilities.JsonUtils;
@@ -50,7 +54,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.widget.Toast.*;
-import static com.aiassoft.bakingapp.utilities.AppUtils.hideSystemUI;
 
 public class MainActivity extends AppCompatActivity
         implements RecipesListAdapter.RecipesAdapterOnClickHandler,
