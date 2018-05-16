@@ -21,6 +21,7 @@ package com.aiassoft.bakingapp.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -61,17 +62,27 @@ public class RecipeActivity extends AppCompatActivity
      */
     public static final String STATE_RECIPE_POS = "array_pos";
 
+    public static final String STATE_METHODS_STEP_RECYCLER = "STATE_METHODS_STEP_RECYCLER";
+
+    /**
+     * Identifies the save instance parameter of the step pos
+     * Used only in tabled mode
+     */
+    public static final String STATE_CURRENT_STEP_POSITION = "step_pos";
+
     /**
      * If there is not a recipepos, this pos will as the default one
      */
-    private static final int DEFAULT_POS = -1;
+    private static final int INVALID_POS = -1;
 
     private MethodStepFragment mMethodStepFragment;
     private IngredientsFragment mIngredientsFragment;
 
     private static Context mContext = null;
     private static Recipe mRecipe = null;
-    private static int mRecipePos = DEFAULT_POS;
+    private static int mRecipePos = INVALID_POS;
+
+    private static int mCurrentStepPosition = INVALID_POS;
 
     /** The Ingredients List Adapter */
     private IngredientsListAdapter mIngredientsListAdapter;
@@ -105,9 +116,14 @@ public class RecipeActivity extends AppCompatActivity
 
         Log.d(LOG_TAG, " :: onCreate");
 
+        Parcelable recyclerState = null;
+
         // recovering the instance state
         if (savedInstanceState != null) {
-            mRecipePos = savedInstanceState.getInt(STATE_RECIPE_POS, DEFAULT_POS);
+            mRecipePos = savedInstanceState.getInt(STATE_RECIPE_POS, INVALID_POS);
+            mCurrentStepPosition = savedInstanceState.getInt(STATE_CURRENT_STEP_POSITION, INVALID_POS);
+
+            recyclerState = savedInstanceState.getParcelable(STATE_METHODS_STEP_RECYCLER);
         } else {
 
             /**
@@ -119,17 +135,21 @@ public class RecipeActivity extends AppCompatActivity
             } else {
 
                 /** Intent parameter should be a valid recipe pos. if not, show error toast and return */
-                mRecipePos = intent.getIntExtra(EXTRA_RECIPE_POS, DEFAULT_POS);
+                mRecipePos = intent.getIntExtra(EXTRA_RECIPE_POS, INVALID_POS);
             }
         }
 
-        if (mRecipePos == DEFAULT_POS) {
+        if (mRecipePos == INVALID_POS) {
             // STATE_RECIPE_POS / EXTRA_RECIPE_POS not found in state / intent's parameter
             closeOnError();
         } else {
 
             initializeActivity();
             populateRecipeData();
+
+            if (recyclerState != null)
+                mMethodStepsRecyclerView.getLayoutManager().onRestoreInstanceState(recyclerState);
+
         }
     }
 
@@ -152,6 +172,10 @@ public class RecipeActivity extends AppCompatActivity
     public void onSaveInstanceState(Bundle outState) {
         Log.d(LOG_TAG, " :: onSaveInstanceState");
         outState.putInt(STATE_RECIPE_POS, mRecipePos);
+        outState.putInt(STATE_CURRENT_STEP_POSITION, mCurrentStepPosition);
+
+        Parcelable recyclerState = mMethodStepsRecyclerView.getLayoutManager().onSaveInstanceState();
+        outState.putParcelable(STATE_METHODS_STEP_RECYCLER, recyclerState);
 
         // call superclass to save any view hierarchy
         super.onSaveInstanceState(outState);
@@ -182,8 +206,8 @@ public class RecipeActivity extends AppCompatActivity
             mIngredientsRecyclerView.setHasFixedSize(false);
 
             /**
-             * The mRecipeListAdapter is responsible for linking our recipe's videos data with the Views that
-             * will end up displaying our videos' data.
+             * The mIngredientsListAdapter is responsible for linking our recipe's ingredients data with the Views that
+             * will end up displaying our ingredients' data.
              */
             mIngredientsListAdapter = new IngredientsListAdapter();
 
@@ -241,7 +265,15 @@ public class RecipeActivity extends AppCompatActivity
         if (!MyApp.isTablet) {
             mIngredientsListAdapter.invalidateData();
             mIngredientsListAdapter.setIngredientsData(mRecipe.getIngredients());
+        } else {
+            mIngredientsTitle.setSelected(true);
+
+            if (mCurrentStepPosition != INVALID_POS) {
+                mMethodStepsListAdapter.highlightedSelectedView();
+                displayMethodStep(mCurrentStepPosition);
+            }
         }
+
         mMethodStepsListAdapter.invalidateData();
         mMethodStepsListAdapter.setMethodStepsData(mRecipe.getSteps());
     }
@@ -255,6 +287,11 @@ public class RecipeActivity extends AppCompatActivity
         // fragment getActivity().onBackPressed();
     }
 
+    private void displayMethodStep(int methodStep) {
+        mCurrentStepPosition = methodStep;
+        mIngredientsTitle.setSelected(false);
+        addMethodStepFragment();
+    }
 
     /**
      * This method is for responding to clicks from our list.
@@ -265,8 +302,7 @@ public class RecipeActivity extends AppCompatActivity
     public void onClick(int stepPosition) {
         if (MyApp.isTablet) {
             Toast.makeText(this, "Step: " + stepPosition, Toast.LENGTH_SHORT).show();
-            mIngredientsTitle.setSelected(false);
-            addMethodStepFragment();
+            displayMethodStep(stepPosition);
 
         } else {
             /** Prepare to call the step activity, to show the step's details */
@@ -289,11 +325,16 @@ public class RecipeActivity extends AppCompatActivity
 
     @Override
     public void onClick(View v) {
-        mMethodStepsListAdapter.invalidateSelectedView();
-        if (v.getId() == R.id.tv_ingredients_title)
+        Toast.makeText(this, "Click from: " + v.getTag().toString(), Toast.LENGTH_SHORT).show();
+
+        if (v.getId() == R.id.tv_ingredients_title) {
+            mMethodStepsListAdapter.invalidateSelectedView();
             v.setSelected(true);
 
-        Toast.makeText(this, "Click from: " + v.getTag().toString(), Toast.LENGTH_SHORT).show();
-        addIngredientsFragment();
+            mCurrentStepPosition = INVALID_POS;
+
+            addIngredientsFragment();
+        }
+
     }
 }

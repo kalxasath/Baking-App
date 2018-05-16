@@ -205,4 +205,13 @@ public class MethodStepsListAdapter
 
         mCurrentSelectedView = null;
     }
+
+    /**
+     * This method is used when want to highlighted the selected view
+     */
+    public void highlightedSelectedView() {
+        //TODO save and restore the selected item when rotate the device
+        if (mCurrentSelectedView != null)
+            mCurrentSelectedView.setSelected(true);
+    }
 }
