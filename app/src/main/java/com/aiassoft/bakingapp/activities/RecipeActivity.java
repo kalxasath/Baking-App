@@ -265,6 +265,7 @@ public class RecipeActivity extends AppCompatActivity
     public void onClick(int stepPosition) {
         if (MyApp.isTablet) {
             Toast.makeText(this, "Step: " + stepPosition, Toast.LENGTH_SHORT).show();
+            mIngredientsTitle.setSelected(false);
             addMethodStepFragment();
 
         } else {
@@ -288,6 +289,10 @@ public class RecipeActivity extends AppCompatActivity
 
     @Override
     public void onClick(View v) {
+        mMethodStepsListAdapter.invalidateSelectedView();
+        if (v.getId() == R.id.tv_ingredients_title)
+            v.setSelected(true);
+
         Toast.makeText(this, "Click from: " + v.getTag().toString(), Toast.LENGTH_SHORT).show();
         addIngredientsFragment();
     }

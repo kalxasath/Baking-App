@@ -19,6 +19,7 @@
 package com.aiassoft.bakingapp.adapters;
 
 import android.content.Context;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +48,8 @@ public class MethodStepsListAdapter
 
     /* This array holds a list of Method Steps objects */
     private ArrayList<Step> mMethodStepsData = new ArrayList<>();
+
+    private View mCurrentSelectedView;
 
     /**
      * Defining an on-click handler to make it easy for an Activity
@@ -93,6 +96,11 @@ public class MethodStepsListAdapter
          */
         @Override
         public void onClick(View v) {
+            if (mCurrentSelectedView != null)
+                mCurrentSelectedView.setSelected(false);
+
+            v.setSelected(true);
+            mCurrentSelectedView = v;
             int adapterPosition = getAdapterPosition();
             mClickHandler.onClick(adapterPosition);
         }
@@ -137,8 +145,10 @@ public class MethodStepsListAdapter
         Context context = MethodStepsAdapterViewHolder.mMethodStepRow.getContext();
 
         if (position % 2 == 0) {
-            MethodStepsAdapterViewHolder.mMethodStepRow.setBackgroundColor(
-                    context.getResources().getColor(R.color.ingredientsOddLineBackgroundColor));
+            //MethodStepsAdapterViewHolder.mMethodStepRow.setBackgroundColor(
+            //        context.getResources().getColor(R.color.ingredientsOddLineBackgroundColor));
+            MethodStepsAdapterViewHolder.mMethodStepRow.setBackground(
+                    ResourcesCompat.getDrawable(context.getResources(), R.drawable.background_odd_selector, null));
         }
 
         MethodStepsAdapterViewHolder.mMethodStepName.setText(step.getName());
@@ -186,4 +196,13 @@ public class MethodStepsListAdapter
         notifyDataSetChanged();
     }
 
+    /**
+     * This method is used when want to reset the highlighted view
+     */
+    public void invalidateSelectedView() {
+        if (mCurrentSelectedView != null)
+            mCurrentSelectedView.setSelected(false);
+
+        mCurrentSelectedView = null;
+    }
 }

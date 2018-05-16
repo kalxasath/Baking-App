@@ -40,6 +40,7 @@
     <color name="solidLineColor">#E7E7E7</color>
 
     <color name="ingredientsOddLineBackgroundColor">#F1F7F7</color>
+    <color name="ingredientsSelectedLineBackgroundColor">#BAF7F7</color>
 
     <color name="colorStepIndicator">#CCCCCC</color>
     <color name="colorStepIndicatorCurrent">#757575</color>
