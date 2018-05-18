@@ -5,7 +5,6 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/red"
     >
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -16,14 +15,14 @@
         <com.google.android.exoplayer2.ui.SimpleExoPlayerView
             android:id="@+id/sepv_player"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="wrap_content"
             android:layout_margin="0dp"
             android:visibility="invisible" />
 
         <ImageView
             android:id="@+id/iv_image"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="wrap_content"
             android:layout_margin="0dp"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop" />

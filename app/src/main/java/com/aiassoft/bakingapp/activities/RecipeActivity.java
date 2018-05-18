@@ -32,6 +32,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aiassoft.bakingapp.Const;
 import com.aiassoft.bakingapp.adapters.IngredientsListAdapter;
 import com.aiassoft.bakingapp.adapters.MethodStepsListAdapter;
 import com.aiassoft.bakingapp.MyApp;
@@ -53,36 +54,20 @@ public class RecipeActivity extends AppCompatActivity
     private static final String LOG_TAG = MyApp.APP_TAG + RecipeActivity.class.getSimpleName();
 
     /**
-     * Identifies the incoming parameter of the recipe pos
-     */
-    public static final String EXTRA_RECIPE_POS = "array_pos";
-
-    /**
-     * Identifies the save instance parameter of the recipe pos
-     */
-    public static final String STATE_RECIPE_POS = "array_pos";
-
-    public static final String STATE_METHODS_STEP_RECYCLER = "STATE_METHODS_STEP_RECYCLER";
-
-    /**
      * Identifies the save instance parameter of the step pos
      * Used only in tabled mode
      */
     public static final String STATE_CURRENT_STEP_POSITION = "step_pos";
 
-    /**
-     * If there is not a recipepos, this pos will as the default one
-     */
-    private static final int INVALID_POS = -1;
-
+    private static boolean mPopulateFragments = true;
     private MethodStepFragment mMethodStepFragment;
     private IngredientsFragment mIngredientsFragment;
 
     private static Context mContext = null;
     private static Recipe mRecipe = null;
-    private static int mRecipePos = INVALID_POS;
+    private static int mRecipePos = Const.INVALID_INT;
 
-    private static int mCurrentStepPosition = INVALID_POS;
+    private static int mCurrentStepPosition = Const.INVALID_INT;
 
     /** The Ingredients List Adapter */
     private IngredientsListAdapter mIngredientsListAdapter;
@@ -92,7 +77,6 @@ public class RecipeActivity extends AppCompatActivity
 
     /** The views in the xml file */
     /** The Ingredients recycler view */
-    //@BindView(R.id.rv_ingredients) RecyclerView mIngredientsRecyclerView;
     RecyclerView mIngredientsRecyclerView;
 
     /** The Method Steps recycler view */
@@ -118,12 +102,15 @@ public class RecipeActivity extends AppCompatActivity
 
         Parcelable recyclerState = null;
 
-        // recovering the instance state
-        if (savedInstanceState != null) {
-            mRecipePos = savedInstanceState.getInt(STATE_RECIPE_POS, INVALID_POS);
-            mCurrentStepPosition = savedInstanceState.getInt(STATE_CURRENT_STEP_POSITION, INVALID_POS);
+        /** Avoid second call of fragments onCreateView if the activity is restarted by system */
+        mPopulateFragments = (savedInstanceState == null);
 
-            recyclerState = savedInstanceState.getParcelable(STATE_METHODS_STEP_RECYCLER);
+        /** recovering the instance state */
+        if (savedInstanceState != null) {
+            mRecipePos = savedInstanceState.getInt(Const.STATE_RECIPE_POS, Const.INVALID_INT);
+            mCurrentStepPosition = savedInstanceState.getInt(STATE_CURRENT_STEP_POSITION, Const.INVALID_INT);
+
+            recyclerState = savedInstanceState.getParcelable(Const.STATE_METHODS_STEP_RECYCLER);
         } else {
 
             /**
@@ -135,11 +122,11 @@ public class RecipeActivity extends AppCompatActivity
             } else {
 
                 /** Intent parameter should be a valid recipe pos. if not, show error toast and return */
-                mRecipePos = intent.getIntExtra(EXTRA_RECIPE_POS, INVALID_POS);
+                mRecipePos = intent.getIntExtra(Const.EXTRA_RECIPE_POS, Const.INVALID_INT);
             }
         }
 
-        if (mRecipePos == INVALID_POS) {
+        if (mRecipePos == Const.INVALID_INT) {
             // STATE_RECIPE_POS / EXTRA_RECIPE_POS not found in state / intent's parameter
             closeOnError();
         } else {
@@ -171,11 +158,11 @@ public class RecipeActivity extends AppCompatActivity
     @Override
     public void onSaveInstanceState(Bundle outState) {
         Log.d(LOG_TAG, " :: onSaveInstanceState");
-        outState.putInt(STATE_RECIPE_POS, mRecipePos);
+        outState.putInt(Const.STATE_RECIPE_POS, mRecipePos);
         outState.putInt(STATE_CURRENT_STEP_POSITION, mCurrentStepPosition);
 
         Parcelable recyclerState = mMethodStepsRecyclerView.getLayoutManager().onSaveInstanceState();
-        outState.putParcelable(STATE_METHODS_STEP_RECYCLER, recyclerState);
+        outState.putParcelable(Const.STATE_METHODS_STEP_RECYCLER, recyclerState);
 
         // call superclass to save any view hierarchy
         super.onSaveInstanceState(outState);
@@ -190,7 +177,8 @@ public class RecipeActivity extends AppCompatActivity
             /** Add a click listener to the mIngredientsTitle to show the Ingredients in the Fragment */
             mIngredientsTitle.setOnClickListener(this);
 
-            addIngredientsFragment();
+            if (mPopulateFragments)
+                addIngredientsFragment();
 
         } else {
             /**
@@ -239,6 +227,8 @@ public class RecipeActivity extends AppCompatActivity
         /** Create a new MethodStepFragment to display it using the FragmentManager */
         mMethodStepFragment = new MethodStepFragment();
 
+        mMethodStepFragment.setRecipeStep(mRecipe.getSteps().get(mCurrentStepPosition));
+
         /** Use a FragmentManager and Transaction to add the fragment to the screen */
         FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -251,6 +241,9 @@ public class RecipeActivity extends AppCompatActivity
     private void addIngredientsFragment() {
         /** Create a new MethodStepFragment to display it using the FragmentManager */
         mIngredientsFragment = new IngredientsFragment();
+
+        /** Set the Recipe Pos */
+        mIngredientsFragment.setRecipePos(mRecipePos);
 
         /** Use a FragmentManager and Transaction to add the fragment to the screen */
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -268,7 +261,7 @@ public class RecipeActivity extends AppCompatActivity
         } else {
             mIngredientsTitle.setSelected(true);
 
-            if (mCurrentStepPosition != INVALID_POS) {
+            if (mCurrentStepPosition != Const.INVALID_INT) {
                 mMethodStepsListAdapter.highlightedSelectedView();
                 displayMethodStep(mCurrentStepPosition);
             }
@@ -290,7 +283,8 @@ public class RecipeActivity extends AppCompatActivity
     private void displayMethodStep(int methodStep) {
         mCurrentStepPosition = methodStep;
         mIngredientsTitle.setSelected(false);
-        addMethodStepFragment();
+        if (mPopulateFragments)
+            addMethodStepFragment();
     }
 
     /**
@@ -307,8 +301,8 @@ public class RecipeActivity extends AppCompatActivity
         } else {
             /** Prepare to call the step activity, to show the step's details */
             Intent intent = new Intent(this, StepActivity.class);
-            intent.putExtra(StepActivity.EXTRA_RECIPE_POS, mRecipePos);
-            intent.putExtra(StepActivity.EXTRA_STEP_POS, stepPosition);
+            intent.putExtra(Const.EXTRA_RECIPE_POS, mRecipePos);
+            intent.putExtra(Const.EXTRA_STEP_POS, stepPosition);
             startActivity(intent);
         }
     }
@@ -331,7 +325,7 @@ public class RecipeActivity extends AppCompatActivity
             mMethodStepsListAdapter.invalidateSelectedView();
             v.setSelected(true);
 
-            mCurrentStepPosition = INVALID_POS;
+            mCurrentStepPosition = Const.INVALID_INT;
 
             addIngredientsFragment();
         }

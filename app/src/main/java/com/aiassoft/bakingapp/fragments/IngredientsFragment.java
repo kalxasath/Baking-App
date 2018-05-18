@@ -7,17 +7,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
+import com.aiassoft.bakingapp.Const;
 import com.aiassoft.bakingapp.MyApp;
 import com.aiassoft.bakingapp.R;
-import com.aiassoft.bakingapp.activities.RecipeActivity;
 import com.aiassoft.bakingapp.adapters.IngredientsListAdapter;
 import com.aiassoft.bakingapp.model.Recipe;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
-
-import butterknife.BindView;
 
 /**
  * Created by gvryn on 15/05/18.
@@ -27,13 +22,8 @@ public class IngredientsFragment extends Fragment {
 
     private static final String LOG_TAG = MyApp.APP_TAG + IngredientsFragment.class.getSimpleName();
 
-    /**
-     * If there is not a recipepos, this pos will as the default one
-     */
-    private static final int DEFAULT_POS = -1;
-
     private static Recipe mRecipe = null;
-    private static int mRecipePos = DEFAULT_POS;
+    private static int mRecipePos = Const.INVALID_INT;
 
     /** The Ingredients List Adapter */
     private IngredientsListAdapter mIngredientsListAdapter;
@@ -56,6 +46,11 @@ public class IngredientsFragment extends Fragment {
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        /** Load the saved state */
+        if (savedInstanceState != null) {
+            mRecipePos = savedInstanceState.getInt(Const.STATE_RECIPE_POS, Const.INVALID_INT);
+        }
+
         /** Inflate the layout*/
         View rootView = inflater.inflate(R.layout.fragment_recipe_ingredients, container, false);
 
@@ -80,10 +75,25 @@ public class IngredientsFragment extends Fragment {
 
         mIngredientsListAdapter.invalidateData();
         //TODO PASS THE RECIPE ID TO GET THE DATA
-        mRecipe = MyApp.mRecipesData.get(1);
-        mIngredientsListAdapter.setIngredientsData(mRecipe.getIngredients());
+        if (mRecipePos != Const.INVALID_INT) {
+            mRecipe = MyApp.mRecipesData.get(mRecipePos);
+            mIngredientsListAdapter.setIngredientsData(mRecipe.getIngredients());
+        }
 
         /** return the rootView */
         return rootView;
+    }
+
+    /** invoked when the activity may be temporarily destroyed, save the instance state here */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt(Const.STATE_RECIPE_POS, mRecipePos);
+
+        // call superclass to save any view hierarchy
+        super.onSaveInstanceState(outState);
+    }
+
+    public void setRecipePos(int recipePos) {
+        this.mRecipePos = recipePos;
     }
 }

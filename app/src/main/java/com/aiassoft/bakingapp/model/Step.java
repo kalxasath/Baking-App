@@ -18,13 +18,16 @@
 
 package com.aiassoft.bakingapp.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.aiassoft.bakingapp.MyApp;
 
 /**
  * Created by gvryn on 20/04/18.
  */
 
-public class Step {
+public class Step implements Parcelable {
     private static final String LOG_TAG = MyApp.APP_TAG + Recipe.class.getSimpleName();
 
     private int id;
@@ -53,6 +56,19 @@ public class Step {
         this.description = description;
         this.videoURL = videoURL;
         this.thumbnailURL = thumbnailURL;
+    }
+
+    /**
+     * The private constructor gets an parcel object and
+     * sets the class fields from the parcel object
+     * @param in
+     */
+    public Step(Parcel in) {
+        this.id = in.readInt();
+        this.name = in.readString();
+        this.description = in.readString();
+        this.videoURL = in.readString();
+        this.thumbnailURL = in.readString();
     }
 
     public int getId() {
@@ -87,4 +103,41 @@ public class Step {
 
     public void  setThumbnailURL(String thumbnailURL) { this.thumbnailURL = thumbnailURL; }
 
+    /**
+     * Required by Parcelable
+     * @return
+     */
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    /**
+     * Puts the class fields to the parcel object
+     * @param dest a Parcel object
+     * @param flags
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(name);
+        dest.writeString(description);
+        dest.writeString(videoURL);
+        dest.writeString(thumbnailURL);
+    }
+
+    /**
+     * Receive and decode whatever is inside the parcel
+     */
+    public final Parcelable.Creator<Step> CREATOR = new Parcelable.Creator<Step>() {
+        @Override
+        public Step createFromParcel(Parcel in) {
+            return new Step(in);
+        }
+
+        @Override
+        public Step[] newArray(int size) {
+            return new Step[size];
+        }
+    };
 }

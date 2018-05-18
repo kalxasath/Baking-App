@@ -333,7 +333,7 @@ public class MainActivity extends AppCompatActivity
     public void onClick(int recipePosition) {
         /** Prepare to call the detail activity, to show the recipe's details */
         Intent intent = new Intent(this, RecipeActivity.class);
-        intent.putExtra(RecipeActivity.EXTRA_RECIPE_POS, recipePosition);
+        intent.putExtra(Const.EXTRA_RECIPE_POS, recipePosition);
         startActivity(intent);
     }
 

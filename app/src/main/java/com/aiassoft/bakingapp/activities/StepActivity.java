@@ -39,6 +39,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aiassoft.bakingapp.Const;
 import com.aiassoft.bakingapp.MyApp;
 import com.aiassoft.bakingapp.R;
 import com.aiassoft.bakingapp.adapters.SliderAdapter;
@@ -82,36 +83,11 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
     private static final String LOG_TAG = MyApp.APP_TAG + StepActivity.class.getSimpleName();
 
-    /**
-     * Identifies the incoming parameter of the recipe pos
-     */
-    public static final String EXTRA_RECIPE_POS = "recipe_pos";
-
-    /**
-     * Identifies the save instance parameter of the recipe pos
-     */
-    public static final String STATE_RECIPE_POS = "array_pos";
-
-    /**
-     * Identifies the incoming parameter of the step pos
-     */
-    public static final String EXTRA_STEP_POS = "step_pos";
-
-    /**
-     * Identifies the save instance parameter of the step pos
-     */
-    public static final String STATE_STEP_POS = "step_pos";
-
-    /**
-     * If there is not a pos, this pos will as the default one
-     */
-    private static final int DEFAULT_POS = -1;
-
     private static Context mContext = null;
     private static Recipe mRecipe = null;
     private static List<Step> mSteps = null;
-    private static int mRecipePos = DEFAULT_POS;
-    private static int mStepPos = DEFAULT_POS;
+    private static int mRecipePos = Const.INVALID_INT;
+    private static int mStepPos = Const.INVALID_INT;
 
     private SimpleExoPlayer mExoPlayer;
     @BindView(R.id.sepv_player) SimpleExoPlayerView mPlayer;
@@ -148,8 +124,8 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
         // recovering the instance state
         if (savedInstanceState != null) {
 
-            mRecipePos = savedInstanceState.getInt(STATE_RECIPE_POS, DEFAULT_POS);
-            mStepPos = savedInstanceState.getInt(STATE_STEP_POS, DEFAULT_POS);
+            mRecipePos = savedInstanceState.getInt(Const.STATE_RECIPE_POS, Const.INVALID_INT);
+            mStepPos = savedInstanceState.getInt(Const.STATE_STEP_POS, Const.INVALID_INT);
 
         } else {
             /** should be called from another activity. if not, show error toast and return */
@@ -161,12 +137,12 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
                 /**
                  * should be called from another activity. if not, show error toast and return
                  */
-                mRecipePos = intent.getIntExtra(EXTRA_RECIPE_POS, DEFAULT_POS);
-                mStepPos = intent.getIntExtra(EXTRA_STEP_POS, DEFAULT_POS);
+                mRecipePos = intent.getIntExtra(Const.EXTRA_RECIPE_POS, Const.INVALID_INT);
+                mStepPos = intent.getIntExtra(Const.EXTRA_STEP_POS, Const.INVALID_INT);
             }
         }
 
-        if (mRecipePos == DEFAULT_POS || mStepPos == DEFAULT_POS) {
+        if (mRecipePos == Const.INVALID_INT || mStepPos == Const.INVALID_INT) {
             // EXTRA_RECIPE_POS or EXTRA_STEP_POS not found in intent's parameter
             closeOnError();
         } else {
@@ -192,8 +168,8 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     @Override
     public void onSaveInstanceState(Bundle outState) {
         Log.d(LOG_TAG, " :: onSaveInstanceState");
-        outState.putInt(STATE_RECIPE_POS, mRecipePos);
-        outState.putInt(STATE_STEP_POS, mStepPos);
+        outState.putInt(Const.STATE_RECIPE_POS, mRecipePos);
+        outState.putInt(Const.STATE_STEP_POS, mStepPos);
 
         // call superclass to save any view hierarchy
         super.onSaveInstanceState(outState);

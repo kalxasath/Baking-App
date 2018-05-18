@@ -44,6 +44,31 @@ public class Const {
      */
     public static final boolean RECIPES_ADD_RANDOM_IMAGE_IF_NOT_EXIST = false;
 
+    /**
+     * Identifies the Intent incoming parameter of the recipe pos
+     */
+    public static final String EXTRA_RECIPE_POS = "EXTRA_RECIPE_POS";
+    public static final String EXTRA_STEP_POS = "EXTRA_STEP_POS";
+
+    /**
+     * Identifies the save instance parameters
+     */
+    public static final String STATE_RECIPE_POS = "STATE_RECIPE_POS";
+    public static final String STATE_STEP_POS = "STATE_STEP_POS";
+
+    /**
+     * Identifies the save instance parameter of the recipe pos on the recycler view
+     */
+    public static final String STATE_METHODS_STEP_RECYCLER = "STATE_METHODS_STEP_RECYCLER";
+    public static final String STATE_METHODS_STEP = "STATE_METHODS_STEP";
+
+    /**
+     * Indicates a not initialized integer POS or STEP
+     */
+    public static final int INVALID_INT = -1;
+
+
+
 
     /**
      * This ID will be used to identify the Loader responsible for loading our recipes list.
