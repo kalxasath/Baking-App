@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.aiassoft.bakingapp.Const;
 import com.aiassoft.bakingapp.MyApp;
 import com.aiassoft.bakingapp.R;
 import com.aiassoft.bakingapp.model.Step;
@@ -50,6 +51,7 @@ public class MethodStepsListAdapter
     private ArrayList<Step> mMethodStepsData = new ArrayList<>();
 
     private View mCurrentSelectedView;
+    private int mSelectedViewPos = Const.INVALID_INT;
 
     /**
      * Defining an on-click handler to make it easy for an Activity
@@ -68,8 +70,9 @@ public class MethodStepsListAdapter
      * Creates a MethodStepsAdapter
      *
      */
-    public MethodStepsListAdapter(MethodStepsAdapterOnClickHandler clickHandler) {
+    public MethodStepsListAdapter(MethodStepsAdapterOnClickHandler clickHandler, int selectedViewPos) {
         mClickHandler = clickHandler;
+        mSelectedViewPos = selectedViewPos;
     }
 
     /**
@@ -96,6 +99,8 @@ public class MethodStepsListAdapter
          */
         @Override
         public void onClick(View v) {
+            mSelectedViewPos = Const.INVALID_INT;
+
             if (mCurrentSelectedView != null)
                 mCurrentSelectedView.setSelected(false);
 
@@ -161,6 +166,12 @@ public class MethodStepsListAdapter
             abbreviation = description;
         }
         MethodStepsAdapterViewHolder.mMethodStepDescription.setText(abbreviation);
+
+        if (mSelectedViewPos == position) {
+            //MethodStepsAdapterViewHolder.mMethodStepRow.setSelected(true);
+            mCurrentSelectedView = MethodStepsAdapterViewHolder.mMethodStepRow;
+            highlightedSelectedView();
+        }
     }
 
     /**
@@ -210,7 +221,6 @@ public class MethodStepsListAdapter
      * This method is used when want to highlighted the selected view
      */
     public void highlightedSelectedView() {
-        //TODO save and restore the selected item when rotate the device
         if (mCurrentSelectedView != null)
             mCurrentSelectedView.setSelected(true);
     }

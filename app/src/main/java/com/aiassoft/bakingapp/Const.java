@@ -61,6 +61,7 @@ public class Const {
      */
     public static final String STATE_METHODS_STEP_RECYCLER = "STATE_METHODS_STEP_RECYCLER";
     public static final String STATE_METHODS_STEP = "STATE_METHODS_STEP";
+    public static final String STATE_CURRENT_STEP_POSITION = "STATE_CURRENT_STEP_POSITION";
 
     /**
      * Indicates a not initialized integer POS or STEP

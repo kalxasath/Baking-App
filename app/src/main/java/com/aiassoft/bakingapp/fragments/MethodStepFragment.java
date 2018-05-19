@@ -85,8 +85,6 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
         mThumbnail = rootView.findViewById(R.id.iv_image);
         mRecipeStepInstruction = rootView.findViewById(R.id.tv_recipe_step_instruction);
 
-        // TODO description not shown on image steps
-        // TODO initialized with previous recipe step
         /** bind the information to show in the views */
         mRecipeStepInstruction.setText(mRecipeStep.getDescription());
         displayMedia(mRecipeStep);
@@ -214,8 +212,6 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
      * Release ExoPlayer.
      */
     private void releasePlayer() {
-//        if (mNotificationManager != null)
-//            mNotificationManager.cancelAll();
         if (mExoPlayer != null) {
             mExoPlayer.stop();
             mExoPlayer.release();
@@ -252,7 +248,6 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
                     mExoPlayer.getCurrentPosition(), 1f);
         }
         mMediaSession.setPlaybackState(mStateBuilder.build());
-//        showNotification(mStateBuilder.build());
     }
 
     @Override

@@ -15,17 +15,19 @@
         <com.google.android.exoplayer2.ui.SimpleExoPlayerView
             android:id="@+id/sepv_player"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="400dp"
             android:layout_margin="0dp"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            />
 
         <ImageView
             android:id="@+id/iv_image"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="400dp"
             android:layout_margin="0dp"
             android:adjustViewBounds="true"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            />
 
     </FrameLayout>
 

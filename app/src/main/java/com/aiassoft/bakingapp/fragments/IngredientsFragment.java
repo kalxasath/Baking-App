@@ -74,7 +74,6 @@ public class IngredientsFragment extends Fragment {
         mIngredientsRecyclerView.setAdapter(mIngredientsListAdapter);
 
         mIngredientsListAdapter.invalidateData();
-        //TODO PASS THE RECIPE ID TO GET THE DATA
         if (mRecipePos != Const.INVALID_INT) {
             mRecipe = MyApp.mRecipesData.get(mRecipePos);
             mIngredientsListAdapter.setIngredientsData(mRecipe.getIngredients());

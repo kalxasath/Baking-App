@@ -53,21 +53,15 @@ public class RecipeActivity extends AppCompatActivity
 
     private static final String LOG_TAG = MyApp.APP_TAG + RecipeActivity.class.getSimpleName();
 
-    /**
-     * Identifies the save instance parameter of the step pos
-     * Used only in tabled mode
-     */
-    public static final String STATE_CURRENT_STEP_POSITION = "step_pos";
-
-    private static boolean mPopulateFragments = true;
+    private boolean mPopulateFragments = true;
     private MethodStepFragment mMethodStepFragment;
     private IngredientsFragment mIngredientsFragment;
 
     private static Context mContext = null;
-    private static Recipe mRecipe = null;
-    private static int mRecipePos = Const.INVALID_INT;
+    private Recipe mRecipe = null;
+    private int mRecipePos = Const.INVALID_INT;
 
-    private static int mCurrentStepPosition = Const.INVALID_INT;
+    private int mCurrentStepPosition = Const.INVALID_INT;
 
     /** The Ingredients List Adapter */
     private IngredientsListAdapter mIngredientsListAdapter;
@@ -108,7 +102,7 @@ public class RecipeActivity extends AppCompatActivity
         /** recovering the instance state */
         if (savedInstanceState != null) {
             mRecipePos = savedInstanceState.getInt(Const.STATE_RECIPE_POS, Const.INVALID_INT);
-            mCurrentStepPosition = savedInstanceState.getInt(STATE_CURRENT_STEP_POSITION, Const.INVALID_INT);
+            mCurrentStepPosition = savedInstanceState.getInt(Const.STATE_CURRENT_STEP_POSITION, Const.INVALID_INT);
 
             recyclerState = savedInstanceState.getParcelable(Const.STATE_METHODS_STEP_RECYCLER);
         } else {
@@ -127,7 +121,7 @@ public class RecipeActivity extends AppCompatActivity
         }
 
         if (mRecipePos == Const.INVALID_INT) {
-            // STATE_RECIPE_POS / EXTRA_RECIPE_POS not found in state / intent's parameter
+            /** STATE_RECIPE_POS / EXTRA_RECIPE_POS not found in state / intent's parameter */
             closeOnError();
         } else {
 
@@ -138,6 +132,8 @@ public class RecipeActivity extends AppCompatActivity
                 mMethodStepsRecyclerView.getLayoutManager().onRestoreInstanceState(recyclerState);
 
         }
+
+        mPopulateFragments = true;
     }
 
     /**
@@ -159,12 +155,12 @@ public class RecipeActivity extends AppCompatActivity
     public void onSaveInstanceState(Bundle outState) {
         Log.d(LOG_TAG, " :: onSaveInstanceState");
         outState.putInt(Const.STATE_RECIPE_POS, mRecipePos);
-        outState.putInt(STATE_CURRENT_STEP_POSITION, mCurrentStepPosition);
+        outState.putInt(Const.STATE_CURRENT_STEP_POSITION, mCurrentStepPosition);
 
         Parcelable recyclerState = mMethodStepsRecyclerView.getLayoutManager().onSaveInstanceState();
         outState.putParcelable(Const.STATE_METHODS_STEP_RECYCLER, recyclerState);
 
-        // call superclass to save any view hierarchy
+        /** call superclass to save any view hierarchy */
         super.onSaveInstanceState(outState);
     }
 
@@ -217,7 +213,7 @@ public class RecipeActivity extends AppCompatActivity
          * The mMethodStepsListAdapter is responsible for linking our recipe's method steps data
          * with the Views that will end up displaying our method steps' data.
          */
-        mMethodStepsListAdapter = new MethodStepsListAdapter(this);
+        mMethodStepsListAdapter = new MethodStepsListAdapter(this, mCurrentStepPosition);
 
         /** Setting the adapter attaches it to the RecyclerView in our layout. */
         mMethodStepsRecyclerView.setAdapter(mMethodStepsListAdapter);
