@@ -18,6 +18,7 @@
 
 package com.aiassoft.bakingapp.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -37,6 +38,7 @@ import android.widget.Toast;
 import com.aiassoft.bakingapp.Const;
 import com.aiassoft.bakingapp.MyApp;
 import com.aiassoft.bakingapp.R;
+import com.aiassoft.bakingapp.Widgets.IngredientsWidgetProvider;
 import com.aiassoft.bakingapp.adapters.RecipesListAdapter;
 import com.aiassoft.bakingapp.model.Recipe;
 import com.aiassoft.bakingapp.utilities.AppUtils;
@@ -70,6 +72,8 @@ public class MainActivity extends AppCompatActivity
     /* The Recipes List Adapter */
     private RecipesListAdapter mRecipesListAdapter;
 
+    private static Context mContext;
+
     /** The views in the xml file */
     /** The recycler view */
     @BindView(R.id.rv_recipes) RecyclerView mRecyclerView;
@@ -90,6 +94,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        MyApp.setDataInitialized(false);
+
+        mContext = this;
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -297,6 +305,7 @@ public class MainActivity extends AppCompatActivity
             /** If an error has occurred, show the error message */
             showErrorMessage(R.string.unexpected_fetch_error);
         } else {
+            IngredientsWidgetProvider.sendRefreshBroadcast(mContext);
             /** Else show the recipes list */
             showRecipesListView();
         }

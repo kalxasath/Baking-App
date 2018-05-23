@@ -174,6 +174,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
     public void setRecipesData(List<Recipe> recipesData) {
         if (recipesData == null) return;
         MyApp.mRecipesData.addAll(recipesData);
+        MyApp.setDataInitialized(true);
         notifyDataSetChanged();
     }
 
@@ -182,6 +183,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
      */
     public void invalidateData() {
         MyApp.mRecipesData = new ArrayList<Recipe>();
+        MyApp.setDataInitialized(false);
         notifyDataSetChanged();
     }
 

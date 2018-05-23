@@ -39,6 +39,10 @@
     <color name="dottedLineColor">#40000000</color>
     <color name="solidLineColor">#E7E7E7</color>
 
+    <color name="widgetBackgroundColor">#EEEEEE</color>
+    <color name="widgetRecipeTitleBColor">#c7a500</color>
+    <color name="widgetRecipeTitleFColor">#60000000</color>
+
     <color name="ingredientsOddLineBackgroundColor">#F1F7F7</color>
     <color name="ingredientsSelectedLineBackgroundColor">#BAF7F7</color>
 

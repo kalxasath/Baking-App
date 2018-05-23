@@ -18,6 +18,8 @@
 
 package com.aiassoft.bakingapp.model;
 
+import android.util.Log;
+
 import com.aiassoft.bakingapp.MyApp;
 
 import java.util.List;
@@ -71,7 +73,9 @@ public class Recipe {
         this.name = name;
     }
 
-    public List<Ingredient> getIngredients() { return ingredients; }
+    public List<Ingredient> getIngredients() {
+        Log.d(LOG_TAG, "getIngredients count:" + ingredients.size());
+        return ingredients; }
 
     public void setIngredients(List<Ingredient> ingredients) { this.ingredients = ingredients; }
 

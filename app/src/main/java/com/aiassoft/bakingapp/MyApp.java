@@ -38,13 +38,15 @@ public class MyApp extends Application {
     // static resources
     private static MyApp mInstance;
 
-    public static final String APP_TAG = "Baking_App: ";
+    public static final String APP_TAG = "Baking_App:";
 
     /* This array holds a list of recipe objects */
     public static ArrayList<Recipe> mRecipesData = new ArrayList<>();
 
     /** The table wont change to phone and via versa, so here a little speed up */
     public static boolean isTablet;
+
+    private static boolean dataInitialized = false;
 
 
     /**
@@ -74,6 +76,14 @@ public class MyApp extends Application {
     public boolean isRTL() {
         Configuration config = mInstance.getApplicationContext().getResources().getConfiguration();
         return config.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
+    }
+
+    public static void setDataInitialized(boolean b) {
+        dataInitialized = b;
+    }
+
+    public static boolean hasData() {
+        return dataInitialized;
     }
 
     @Override
