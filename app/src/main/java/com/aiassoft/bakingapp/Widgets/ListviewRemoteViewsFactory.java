@@ -105,7 +105,7 @@ public class ListviewRemoteViewsFactory implements RemoteViewsService.RemoteView
         // that is set on the collection view in ListViewWidgetProvider.
 
         Intent fillInIntent = new Intent();
-        fillInIntent.putExtra(Const.EXTRA_RECIPE_POS, mRecipe);
+        fillInIntent.putExtra(Const.EXTRA_RECIPE_POS, 2);
 
         // Make it possible to distinguish the individual on-click
         // action of a given item

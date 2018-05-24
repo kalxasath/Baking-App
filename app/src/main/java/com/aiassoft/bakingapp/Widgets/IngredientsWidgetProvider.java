@@ -113,6 +113,7 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
                 // Create an Intent to launch the app or the RecipeActivity when clicked
                 setOnClickIntent = new Intent(context, RecipeActivity.class);
                 setOnClickIntent.putExtra(Const.EXTRA_RECIPE_POS, mRecipe);
+                setOnClickIntent.setAction("foo");
                 Log.d(LOG_TAG, "provider onUpdate, SET EXTRAS TO " + mRecipe);
 
                 PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, setOnClickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -135,10 +136,12 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
 
                 // template to handle the click listener for each item
                 Intent clickIntentTemplate = new Intent(context, RecipeActivity.class);
+                //clickIntentTemplate.putExtra(Const.EXTRA_RECIPE_POS, 2);
+                clickIntentTemplate.setAction("foo2");
                 PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
                         .addNextIntentWithParentStack(clickIntentTemplate)
                         .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-                //rv.setPendingIntentTemplate(R.id.lv_ingredients, clickPendingIntentTemplate);
+                rv.setPendingIntentTemplate(R.id.lv_ingredients, clickPendingIntentTemplate);
 
                 //setting an empty view in case of no data
                 rv.setEmptyView(R.id.lv_ingredients, R.id.empty_view);

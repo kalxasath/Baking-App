@@ -1,35 +1,21 @@
-/**
- * Copyright (C) 2018 by George Vrynios
- * This project was made under the supervision of Udacity
- * in the Android Developer Nanodegree Program
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package com.aiassoft.bakingapp.Widgets;
 
-package com.aiassoft.bakingapp.activities;
-
+import android.app.Activity;
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -38,13 +24,12 @@ import android.widget.Toast;
 import com.aiassoft.bakingapp.Const;
 import com.aiassoft.bakingapp.MyApp;
 import com.aiassoft.bakingapp.R;
-import com.aiassoft.bakingapp.Widgets.IngredientsWidgetProvider;
+import com.aiassoft.bakingapp.activities.RecipeActivity;
 import com.aiassoft.bakingapp.adapters.RecipesListAdapter;
 import com.aiassoft.bakingapp.model.Recipe;
 import com.aiassoft.bakingapp.utilities.AppUtils;
 import com.aiassoft.bakingapp.utilities.JsonUtils;
 import com.aiassoft.bakingapp.utilities.NetworkUtils;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -55,13 +40,21 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static android.widget.Toast.*;
+import static android.widget.Toast.LENGTH_SHORT;
 
-public class MainActivity extends AppCompatActivity
-        implements RecipesListAdapter.RecipesAdapterOnClickHandler,
-        LoaderCallbacks<List<Recipe>> {
+/**
+ * Created by gvryn on 24/05/18.
+ */
 
-    private static final String LOG_TAG = MyApp.APP_TAG + MainActivity.class.getSimpleName();
+public class IngredientsWidgetConfigureActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<List<Recipe>>,
+        RecipesListAdapter.RecipesAdapterOnClickHandler
+        {
+
+    private static final String LOG_TAG = MyApp.APP_TAG + IngredientsWidgetConfigureActivity.class.getSimpleName();
+
+    int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+    private AppWidgetManager widgetManager;
 
     /* The Recipes List Adapter */
     private RecipesListAdapter mRecipesListAdapter;
@@ -70,31 +63,54 @@ public class MainActivity extends AppCompatActivity
 
     /** The views in the xml file */
     /** The recycler view */
-    @BindView(R.id.rv_recipes) RecyclerView mRecyclerView;
+    @BindView(R.id.rv_recipes)
+    RecyclerView mRecyclerView;
 
     /** The Error Message Block,
      * is used to display errors and will be hidden if there are no error
      */
-    @BindView(R.id.ll_error_message) LinearLayout mErrorMessageBlock;
+    @BindView(R.id.ll_error_message)
+    LinearLayout mErrorMessageBlock;
 
     /** The view holding the error message */
-    @BindView(R.id.tv_error_message_text) TextView mErrorMessageText;
+    @BindView(R.id.tv_error_message_text)
+    TextView mErrorMessageText;
 
     /**
      * The ProgressBar that will indicate to the user that we are loading data.
      * It will be hidden when no data is loading.
      */
-    @BindView(R.id.pb_loading_indicator) ProgressBar mLoadingIndicator;
+    @BindView(R.id.pb_loading_indicator)
+    ProgressBar mLoadingIndicator;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        MyApp.setDataInitialized(false);
+    public void onCreate(Bundle bundle) {
+        Log.d(LOG_TAG, "onCreate");
 
         mContext = this;
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        super.onCreate(bundle);
+        setContentView(R.layout.activity_widget_configuration);
         ButterKnife.bind(this);
+
+        setResult(RESULT_CANCELED);
+
+        widgetManager = AppWidgetManager.getInstance(this);
+
+        Toast.makeText(this, "widget activity", Toast.LENGTH_SHORT).show();
+
+        // Find the widget id from the intent.
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+        }
+        Log.d(LOG_TAG, "mAppWidgetId= " + mAppWidgetId);
+        if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+            finish();
+            return;
+        }
+
 
         /*
          * The gridLayoutManager is responsible for measuring and positioning item views within a
@@ -125,20 +141,73 @@ public class MainActivity extends AppCompatActivity
         /* Setting the adapter attaches it to the RecyclerView in our layout. */
         mRecyclerView.setAdapter(mRecipesListAdapter);
 
-        /* We will check if we are connected to the internet */
-        if (! NetworkUtils.isOnline()) {
+
+
+        if (! MyApp.hasData()) {
+            /* We will check if we are connected to the internet */
+            if (!NetworkUtils.isOnline()) {
             /* We are not connected, show the Error Block
              * with the propriety error message
              */
-            //showErrorMessage(R.string.error_check_your_network_connectivity);
-            Toast.makeText(this, R.string.error_check_your_network_connectivity , LENGTH_SHORT).show();
-            finish();
-            return;
+                //showErrorMessage(R.string.error_check_your_network_connectivity);
+                Toast.makeText(this, R.string.error_check_your_network_connectivity, LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+
+            /* Otherwise fetch recipes' data from the internet */
+            fetchRecipesList();
         }
 
-        /* Otherwise fetch recipes' data from the internet */
-        fetchRecipesList();
-    } // onCreate
+        initializeActivity();
+
+/*
+        Button setupWidget = (Button) findViewById(R.id.setupWidget);
+        setupWidget.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                handleSetupWidget();
+            }
+        });
+*/
+        /*
+
+        //setResult(RESULT_CANCELED);
+        Intent resultValue = new Intent();
+        // Set the results as expected from a 'configure activity'.
+        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+        setResult(RESULT_OK, resultValue);
+        finish();
+        */
+    }
+
+    private void initializeActivity() {
+
+
+    }
+
+    /**
+     * This method is for responding to clicks from our list.
+     *
+     * @param recipePosition the Position from the selected recipe
+     */
+    @Override
+    public void onClick(int recipePosition) {
+        if (MyApp.hasData())
+            Toast.makeText(mContext, "has Data", Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(mContext, "NO DATA", Toast.LENGTH_LONG).show();
+
+        // TODO save selected receipe to the preferences, maybe with mAppWidgetId
+
+        Intent resultValue = new Intent();
+        // Set the results as expected from a 'configure activity'.
+        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+        setResult(RESULT_OK, resultValue);
+        finish();
+    }
+
 
     /**
      * Fetch the recipes' data from fixed URL
@@ -327,19 +396,6 @@ public class MainActivity extends AppCompatActivity
      */
     private void invalidateData() {
         mRecipesListAdapter.invalidateData();
-    }
-
-    /**
-     * This method is for responding to clicks from our list.
-     *
-     * @param recipePosition the Position from the selected recipe
-     */
-    @Override
-    public void onClick(int recipePosition) {
-        /** Prepare to call the detail activity, to show the recipe's details */
-        Intent intent = new Intent(this, RecipeActivity.class);
-        intent.putExtra(Const.EXTRA_RECIPE_POS, recipePosition);
-        startActivity(intent);
     }
 
     /**

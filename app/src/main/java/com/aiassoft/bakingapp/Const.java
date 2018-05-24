@@ -45,6 +45,12 @@ public class Const {
     public static final boolean RECIPES_ADD_RANDOM_IMAGE_IF_NOT_EXIST = false;
 
     /**
+     * Used to identify the WEB URL that is being used in the loader.loadInBackground
+     * to get the recipes' data
+     */
+    public static final String LOADER_EXTRA = "web_url";
+
+    /**
      * Identifies the Intent incoming parameter of the recipe pos
      */
     public static final String EXTRA_RECIPE_POS = "EXTRA_RECIPE_POS";
