@@ -1,8 +1,7 @@
-package com.aiassoft.bakingapp.Widgets;
+package com.aiassoft.bakingapp.widgets;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -10,7 +9,6 @@ import android.widget.RemoteViewsService;
 import com.aiassoft.bakingapp.Const;
 import com.aiassoft.bakingapp.MyApp;
 import com.aiassoft.bakingapp.R;
-import com.aiassoft.bakingapp.activities.RecipeActivity;
 import com.aiassoft.bakingapp.model.Ingredient;
 
 import java.util.List;
@@ -23,17 +21,20 @@ public class ListviewRemoteViewsFactory implements RemoteViewsService.RemoteView
 
     private static final String LOG_TAG = MyApp.APP_TAG + ListviewRemoteViewsFactory.class.getSimpleName();
 
-    Context mContext;
+    private Context mContext;
 
-    List<Ingredient> mIngredientsData;
+    private List<Ingredient> mIngredientsData;
 
-    int mRecipe;
+    private int mRecipePosition;
 
     public ListviewRemoteViewsFactory(Context applicationContext, Intent intent) {
 
-        Log.d(LOG_TAG, "factory ListviewRemoteViewsFactory");
-
         mContext = applicationContext;
+
+        mRecipePosition = intent.getIntExtra(Const.EXTRA_RECIPE_POS, Const.INVALID_INT);
+
+        Log.d(LOG_TAG, "factory ListviewRemoteViewsFactory for Id:" + mRecipePosition);
+
     }
 
     /** Initialize the data */
@@ -42,8 +43,6 @@ public class ListviewRemoteViewsFactory implements RemoteViewsService.RemoteView
 
         Log.d(LOG_TAG, "factory onCreate");
 
-        // TODO read the appropriated receipt from the preferences
-        mRecipe = 1;
     }
 
     /** called on start and when notifyAppWidgetViewDataChanged is called */
@@ -51,14 +50,14 @@ public class ListviewRemoteViewsFactory implements RemoteViewsService.RemoteView
     public void onDataSetChanged() {
         mIngredientsData = null;
 
-        Log.d(LOG_TAG, "factory onDataSetChanged = " + mRecipe);
+        Log.d(LOG_TAG, "factory onDataSetChanged set Recipes Ingredients for " + mRecipePosition);
 
-        if (MyApp.mRecipesData == null) {
-            Log.d(LOG_TAG, "factory onDataSetChanged RETURN NULL");
+        if (! MyApp.hasData() || mRecipePosition == Const.INVALID_INT) {
+            Log.d(LOG_TAG, "factory onDataSetChanged NOT INITIALIZED, MyApp.hasData: " + MyApp.hasData() + ", recipePos: " + mRecipePosition);
             return;
         }
 
-        mIngredientsData = MyApp.mRecipesData.get(mRecipe).getIngredients();
+        mIngredientsData = MyApp.mRecipesData.get(mRecipePosition).getIngredients();
 
         Log.d(LOG_TAG, "factory onDataSetChanged AFTER");
     }

@@ -31,6 +31,13 @@ public class Const {
     private Const() {}
 
     /**
+     * Set the Shared Preferences File Name
+     * and Key Name
+     */
+    public static final String PREFS_NAME = "com.aiassoft.bakingapp";
+    public static final String WIDGET_RECIPE_ID = "RECIPE";
+
+    /**
      * Set to TRUE if you want to multiply the recipes
      */
     public static final boolean MULTIPLY_THE_RECIPES = false;
@@ -51,8 +58,9 @@ public class Const {
     public static final String LOADER_EXTRA = "web_url";
 
     /**
-     * Identifies the Intent incoming parameter of the recipe pos
+     * Identifies the Intent incoming parameters
      */
+    public static final String EXTRA_WIDGET_ID = "EXTRA_WIDGET_ID";
     public static final String EXTRA_RECIPE_POS = "EXTRA_RECIPE_POS";
     public static final String EXTRA_STEP_POS = "EXTRA_STEP_POS";
 

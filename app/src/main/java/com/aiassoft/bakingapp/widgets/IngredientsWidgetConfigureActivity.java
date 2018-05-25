@@ -1,12 +1,10 @@
-package com.aiassoft.bakingapp.Widgets;
+package com.aiassoft.bakingapp.widgets;
 
-import android.app.Activity;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -24,7 +21,6 @@ import android.widget.Toast;
 import com.aiassoft.bakingapp.Const;
 import com.aiassoft.bakingapp.MyApp;
 import com.aiassoft.bakingapp.R;
-import com.aiassoft.bakingapp.activities.RecipeActivity;
 import com.aiassoft.bakingapp.adapters.RecipesListAdapter;
 import com.aiassoft.bakingapp.model.Recipe;
 import com.aiassoft.bakingapp.utilities.AppUtils;
@@ -41,6 +37,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.widget.Toast.LENGTH_SHORT;
+import static com.aiassoft.bakingapp.utilities.PrefUtils.setWidgetRecipePosition;
 
 /**
  * Created by gvryn on 24/05/18.
@@ -199,12 +196,16 @@ public class IngredientsWidgetConfigureActivity extends AppCompatActivity
         else
             Toast.makeText(mContext, "NO DATA", Toast.LENGTH_LONG).show();
 
-        // TODO save selected receipe to the preferences, maybe with mAppWidgetId
+        Log.d(LOG_TAG, "mAppWidgetId: " + mAppWidgetId + ", recipePosition:" + recipePosition);
 
-        Intent resultValue = new Intent();
-        // Set the results as expected from a 'configure activity'.
-        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-        setResult(RESULT_OK, resultValue);
+        setWidgetRecipePosition(mAppWidgetId, recipePosition);
+
+        IngredientsWidgetProvider.sendRefreshBroadcast(mContext);
+
+        Intent resultIntent = new Intent();
+        /** Set the results as expected from a 'configure activity'. */
+        resultIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+        setResult(RESULT_OK, resultIntent);
         finish();
     }
 
@@ -369,8 +370,7 @@ public class IngredientsWidgetConfigureActivity extends AppCompatActivity
             /** If an error has occurred, show the error message */
             showErrorMessage(R.string.unexpected_fetch_error);
         } else {
-            // TODO sendRefreshBroadcast here ???
-            //IngredientsWidgetProvider.sendRefreshBroadcast(mContext);
+            IngredientsWidgetProvider.sendRefreshBroadcast(mContext);
             /** Else show the recipes list */
             showRecipesListView();
         }

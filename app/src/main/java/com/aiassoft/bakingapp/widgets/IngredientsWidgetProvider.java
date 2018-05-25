@@ -1,23 +1,14 @@
-package com.aiassoft.bakingapp.Widgets;
+package com.aiassoft.bakingapp.widgets;
 
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
-import android.view.View;
-import android.widget.RemoteViews;
-import android.widget.Toast;
 
-import com.aiassoft.bakingapp.Const;
 import com.aiassoft.bakingapp.MyApp;
-import com.aiassoft.bakingapp.R;
-import com.aiassoft.bakingapp.activities.MainActivity;
-import com.aiassoft.bakingapp.activities.RecipeActivity;
+import com.aiassoft.bakingapp.services.IngredientsWidgetUpdateService;
 
 /**
  * Implementation of App Widget functionality.
@@ -34,28 +25,34 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
-        Log.d(LOG_TAG, "provider updateAppWidget");
-
+        Log.d(LOG_TAG, "provider UPDATEAppWidget id: " + appWidgetId);
+/*
+        Intent serviceIntent = new Intent(context, IngredientsWidgetUpdateService.class);
+        serviceIntent.putExtra(Const.EXTRA_WIDGET_ID, appWidgetId);
+        Log.d(LOG_TAG, "provider START SERVICE");
+        context.startService(serviceIntent);
+*/
+        /*
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.ingredients_widget_provider);
         views.setTextViewText(R.id.tv_recipe_title, "Makaronada me kima");
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
+        */
     }
 
-    // TODO after retrieving the new data from internet send a broadcast to update widget
-    // TODO Store recipe id in preferences, add preferences in widget service to read the receipe
-    // TODO if app has no data, display message tap to open the app and wait until the data are fetched from internet
-    // TODO Also explain how to set widgets recipe from menu
-    // TODO after setting new recipe in preferences send a broadcat to update widgets data
-    // TODO if more than 1 widget display message only one widget is allowed
-
     /** Every widget action is performed via the OnReceive like APPWIDGET_ENABLED, APPWIDGET_UPDATE */
-    @Override
-    public void onReceive(Context context, Intent intent) {
+    //@Override
+    public void onReceive_(Context context, Intent intent) {
         Log.d(LOG_TAG, "provider onReceive, received: " + intent.getAction());
 
+//        if (intent.getAction().equals(UPDATE_WIDGET)) {
+//            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+//            int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(context, IngredientsWidgetProvider.class));
+//            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.lv_ingredients);
+//        }
+        /*
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
         if (intent.getAction().equals(UPDATE_WIDGET)) {
@@ -70,13 +67,34 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.lv_ingredients);
             }
         }
+        */
         super.onReceive(context, intent);
     }
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        Log.d(LOG_TAG, "provider onUpdate");
 
+        ComponentName thisWidget = new ComponentName(context, IngredientsWidgetProvider.class);
+        int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+
+        // Build the intent to call the service
+        Intent intent = new Intent(context.getApplicationContext(), IngredientsWidgetUpdateService.class);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
+
+        Log.d(LOG_TAG, "provider onUpdate START SERVICE");
+        // Update the widgets via the service
+        context.startService(intent);
+
+        /**
+        // There may be multiple widgets active, so update all of them
+        for (int appWidgetId : appWidgetIds) {
+            Log.d(LOG_TAG, "provider onUpdate id: " + appWidgetId);
+            updateAppWidget(context, appWidgetManager, appWidgetId);
+        }
+        */
+
+
+        /**
         mRecipe = 1;
         Intent setOnClickIntent;
         Intent setListviewRemoteViewsIntent;
@@ -109,7 +127,6 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
                 rv.setViewVisibility(R.id.lv_ingredients, View.GONE);
                 rv.setEmptyView(R.id.lv_ingredients, R.id.empty_view);
             } else {
-                // TODO include the real mRecipe
                 // Create an Intent to launch the app or the RecipeActivity when clicked
                 setOnClickIntent = new Intent(context, RecipeActivity.class);
                 setOnClickIntent.putExtra(Const.EXTRA_RECIPE_POS, mRecipe);
@@ -155,6 +172,7 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
 
             //updateAppWidget(context, appWidgetManager, appWidgetId);
         }
+        */
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
@@ -164,7 +182,7 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
 //        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 //        int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(context, IngredientsWidgetProvider.class));
 //
-//        Log.d(LOG_TAG, "no of widgets: " + appWidgetIds.length);
+        Log.d(LOG_TAG, "onEnabled");
     }
 
     @Override
@@ -173,9 +191,52 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
     }
 
     public static void sendRefreshBroadcast(Context context) {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(context, IngredientsWidgetProvider.class));
+        Log.d(LOG_TAG, "sendRefreshBroadcast, number of widgets to refresh: " + appWidgetIds.length);
         Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
         intent.setComponent(new ComponentName(context, IngredientsWidgetProvider.class));
         context.sendBroadcast(intent);
     }
+
 }
 
+
+
+/**
+ public class DemoWidget extends AppWidgetProvider {
+
+ static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
+ int appWidgetId) {
+
+ CharSequence widgetText = context.getString(R.string.appwidget_text);
+ // Construct the RemoteViews object
+ RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.demo_widget);
+ views.setTextViewText(R.id.appwidget_text, widgetText);
+
+ // Instruct the widget manager to update the widget
+ appWidgetManager.updateAppWidget(appWidgetId, views);
+ }
+
+ @Override
+ public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+ // There may be multiple widgets active, so update all of them
+ for (int appWidgetId : appWidgetIds) {
+ updateAppWidget(context, appWidgetManager, appWidgetId);
+ }
+ }
+
+ @Override
+ public void onEnabled(Context context) {
+ // Enter relevant functionality for when the first widget is created
+ }
+
+ @Override
+ public void onDisabled(Context context) {
+ // Enter relevant functionality for when the last widget is disabled
+ }
+ }
+
+
+ */

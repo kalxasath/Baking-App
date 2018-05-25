@@ -38,13 +38,13 @@ import android.widget.Toast;
 import com.aiassoft.bakingapp.Const;
 import com.aiassoft.bakingapp.MyApp;
 import com.aiassoft.bakingapp.R;
-import com.aiassoft.bakingapp.Widgets.IngredientsWidgetProvider;
 import com.aiassoft.bakingapp.adapters.RecipesListAdapter;
 import com.aiassoft.bakingapp.model.Recipe;
 import com.aiassoft.bakingapp.utilities.AppUtils;
 import com.aiassoft.bakingapp.utilities.JsonUtils;
 import com.aiassoft.bakingapp.utilities.NetworkUtils;
 
+import com.aiassoft.bakingapp.widgets.IngredientsWidgetProvider;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -300,8 +300,7 @@ public class MainActivity extends AppCompatActivity
             /** If an error has occurred, show the error message */
             showErrorMessage(R.string.unexpected_fetch_error);
         } else {
-            // TODO sendRefreshBroadcast here ???
-            //IngredientsWidgetProvider.sendRefreshBroadcast(mContext);
+            IngredientsWidgetProvider.sendRefreshBroadcast(mContext);
             /** Else show the recipes list */
             showRecipesListView();
         }

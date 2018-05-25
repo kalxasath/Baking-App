@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:configure="com.aiassoft.bakingapp.Widgets.IngredientsWidgetConfigureActivity"
+    android:configure="com.aiassoft.bakingapp.widgets.IngredientsWidgetConfigureActivity"
     android:initialKeyguardLayout="@layout/ingredients_widget_provider"
     android:initialLayout="@layout/ingredients_widget_provider"
     android:minHeight="110dp"

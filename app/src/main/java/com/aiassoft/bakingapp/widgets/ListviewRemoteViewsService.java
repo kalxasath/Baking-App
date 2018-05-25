@@ -1,4 +1,4 @@
-package com.aiassoft.bakingapp.Widgets;
+package com.aiassoft.bakingapp.widgets;
 
 import android.content.Intent;
 import android.util.Log;

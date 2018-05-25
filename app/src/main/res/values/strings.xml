@@ -44,8 +44,9 @@
     <string name="prev">Prev</string>
     <string name="next">Next</string>
     <string name="add_widget">Add widget</string>
-    <string name="appwidget_select_recipe">Tap to open the app then from the menu choose the widget option and then from the list choose the recipe to display the ingredients</string>
+    <string name="appwidget_select_recipe">Open the Baking App and see the magics happened to this widget ;)</string>
     <string name="appwidget_title">Baking App</string>
     <string name="appwidget_title_select_recipe">Select the recipe for the Ingredients widget</string>
+    <string name="appwidget_text">EXAMPLE</string>
 
 </resources>
