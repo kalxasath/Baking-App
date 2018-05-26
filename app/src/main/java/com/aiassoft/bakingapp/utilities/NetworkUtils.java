@@ -59,7 +59,7 @@ public class NetworkUtils {
             e.printStackTrace();
         }
 
-        Log.d(LOG_TAG, "Builded GetPictures URL: " + url);
+        //Log.d(LOG_TAG, "Builded GetPictures URL: " + url);
 
         return url;
     }
@@ -75,7 +75,7 @@ public class NetworkUtils {
         s = s.substring(s.indexOf("(") + 1);
         s = s.substring(0, s.length()-1);
 
-        Log.d(LOG_TAG, "final json: " + s);
+        //Log.d(LOG_TAG, "final json: " + s);
 
         return JsonUtils.jsonFlickrGetPicture(s);
     }

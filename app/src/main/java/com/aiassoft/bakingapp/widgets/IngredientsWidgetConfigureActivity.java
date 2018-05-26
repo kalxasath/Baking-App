@@ -29,12 +29,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.aiassoft.bakingapp.Const;
 import com.aiassoft.bakingapp.MyApp;
@@ -54,13 +52,18 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static android.widget.Toast.LENGTH_SHORT;
 import static com.aiassoft.bakingapp.utilities.PrefUtils.setWidgetRecipePosition;
 
 /**
  * Created by gvryn on 24/05/18.
  */
 
+/**
+ * This activity is started from the widget provider every time
+ * the user creates a new widget in the home screen.
+ * This activity allows the users to select the recipe
+ * that the widget will show the ingredients
+ */
 public class IngredientsWidgetConfigureActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<List<Recipe>>,
         RecipesListAdapter.RecipesAdapterOnClickHandler
@@ -100,8 +103,6 @@ public class IngredientsWidgetConfigureActivity extends AppCompatActivity
 
     @Override
     public void onCreate(Bundle bundle) {
-        Log.d(LOG_TAG, "onCreate");
-
         mContext = this;
 
         super.onCreate(bundle);
@@ -112,15 +113,13 @@ public class IngredientsWidgetConfigureActivity extends AppCompatActivity
 
         widgetManager = AppWidgetManager.getInstance(this);
 
-        Toast.makeText(this, "widget activity", Toast.LENGTH_SHORT).show();
-
         // Find the widget id from the intent.
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         if (extras != null) {
             mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         }
-        Log.d(LOG_TAG, "mAppWidgetId= " + mAppWidgetId);
+
         if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish();
             return;
@@ -164,8 +163,6 @@ public class IngredientsWidgetConfigureActivity extends AppCompatActivity
             /* We are not connected, show the Error Block
              * with the propriety error message
              */
-                //showErrorMessage(R.string.error_check_your_network_connectivity);
-                Toast.makeText(this, R.string.error_check_your_network_connectivity, LENGTH_SHORT).show();
                 finish();
                 return;
             }
@@ -176,25 +173,6 @@ public class IngredientsWidgetConfigureActivity extends AppCompatActivity
 
         initializeActivity();
 
-/*
-        Button setupWidget = (Button) findViewById(R.id.setupWidget);
-        setupWidget.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                handleSetupWidget();
-            }
-        });
-*/
-        /*
-
-        //setResult(RESULT_CANCELED);
-        Intent resultValue = new Intent();
-        // Set the results as expected from a 'configure activity'.
-        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-        setResult(RESULT_OK, resultValue);
-        finish();
-        */
     }
 
     private void initializeActivity() {
@@ -209,13 +187,6 @@ public class IngredientsWidgetConfigureActivity extends AppCompatActivity
      */
     @Override
     public void onClick(int recipePosition) {
-        if (MyApp.hasData())
-            Toast.makeText(mContext, "has Data", Toast.LENGTH_LONG).show();
-        else
-            Toast.makeText(mContext, "NO DATA", Toast.LENGTH_LONG).show();
-
-        Log.d(LOG_TAG, "mAppWidgetId: " + mAppWidgetId + ", recipePosition:" + recipePosition);
-
         setWidgetRecipePosition(mAppWidgetId, recipePosition);
 
         IngredientsWidgetProvider.sendRefreshBroadcast(mContext);

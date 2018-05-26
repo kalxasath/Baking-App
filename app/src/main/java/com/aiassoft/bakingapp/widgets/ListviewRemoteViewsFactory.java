@@ -20,7 +20,6 @@ package com.aiassoft.bakingapp.widgets;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -35,6 +34,9 @@ import java.util.List;
  * Created by gvryn on 20/05/18.
  */
 
+/**
+ * Populates the listview in the widget with the recipe ingredients
+ */
 public class ListviewRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private static final String LOG_TAG = MyApp.APP_TAG + ListviewRemoteViewsFactory.class.getSimpleName();
@@ -50,16 +52,10 @@ public class ListviewRemoteViewsFactory implements RemoteViewsService.RemoteView
         mContext = applicationContext;
 
         mRecipePosition = intent.getIntExtra(Const.EXTRA_RECIPE_POS, Const.INVALID_INT);
-
-        Log.d(LOG_TAG, "factory ListviewRemoteViewsFactory for Id:" + mRecipePosition);
-
     }
 
-    /** Initialize the data */
     @Override
     public void onCreate() {
-
-        Log.d(LOG_TAG, "factory onCreate");
 
     }
 
@@ -68,16 +64,11 @@ public class ListviewRemoteViewsFactory implements RemoteViewsService.RemoteView
     public void onDataSetChanged() {
         mIngredientsData = null;
 
-        Log.d(LOG_TAG, "factory onDataSetChanged set Recipes Ingredients for " + mRecipePosition);
-
         if (! MyApp.hasData() || mRecipePosition == Const.INVALID_INT) {
-            Log.d(LOG_TAG, "factory onDataSetChanged NOT INITIALIZED, MyApp.hasData: " + MyApp.hasData() + ", recipePos: " + mRecipePosition);
             return;
         }
 
         mIngredientsData = MyApp.mRecipesData.get(mRecipePosition).getIngredients();
-
-        Log.d(LOG_TAG, "factory onDataSetChanged AFTER");
     }
 
     @Override
@@ -88,11 +79,8 @@ public class ListviewRemoteViewsFactory implements RemoteViewsService.RemoteView
     @Override
     public int getCount() {
         if (mIngredientsData == null) {
-            //Log.d(LOG_TAG, "factory getCount = 0");
             return 0;
         }
-
-        //Log.d(LOG_TAG, "factory getCount = " + mIngredientsData.size());
 
         return mIngredientsData.size();
     }
@@ -102,8 +90,6 @@ public class ListviewRemoteViewsFactory implements RemoteViewsService.RemoteView
         if (getCount() == 0)
             return null;
 
-
-        //Log.d(LOG_TAG, "factory getViewAt = " + position);
 
         Ingredient ingredient = mIngredientsData.get(position);
 
@@ -117,16 +103,6 @@ public class ListviewRemoteViewsFactory implements RemoteViewsService.RemoteView
         rv.setTextViewText(R.id.tv_quantity, mContext.getString(R.string.ingredient_quantity
                 , ""+ingredient.getQuantity(), ingredient.getMeasure()));
         // end feed row
-
-        // Next, set a fill-intent, which will be used to fill in the pending intent template
-        // that is set on the collection view in ListViewWidgetProvider.
-
-        Intent fillInIntent = new Intent();
-        fillInIntent.putExtra(Const.EXTRA_RECIPE_POS, 2);
-
-        // Make it possible to distinguish the individual on-click
-        // action of a given item
-        rv.setOnClickFillInIntent(R.id.ll_ingredient_row, fillInIntent);
 
         // Return the RemoteViews object.
         return rv;

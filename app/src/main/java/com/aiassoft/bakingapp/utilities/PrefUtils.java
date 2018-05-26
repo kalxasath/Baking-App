@@ -29,9 +29,17 @@ import static android.content.Context.MODE_PRIVATE;
  * Created by gvryn on 25/05/18.
  */
 
+/** for each widget save the recipe position, so we can populate the ingredients
+ * with out to have to ask the user every time
+ */
 public class PrefUtils {
     private static final String LOG_TAG = MyApp.APP_TAG + PrefUtils.class.getSimpleName();
 
+    /**
+     * Save the recipe position to the widget
+     * @param widgetId the widget id
+     * @param recipePosition the recipe position
+     */
     public static void setWidgetRecipePosition(int widgetId, int recipePosition) {
         SharedPreferences sp = MyApp.getContext().getSharedPreferences(Const.PREFS_NAME, MODE_PRIVATE);
         SharedPreferences.Editor ed = sp.edit();
@@ -39,16 +47,28 @@ public class PrefUtils {
         ed.apply();
     }
 
+    /**
+     * return the recipe position for a widget
+     * @param widgetId the widget id
+     * @return the recipe position
+     */
     public static int getWidgetRecipePosition(int widgetId) {
         SharedPreferences sp = MyApp.getContext().getSharedPreferences(Const.PREFS_NAME, MODE_PRIVATE);
         return sp.getInt(Const.WIDGET_RECIPE_ID + widgetId, Const.INVALID_INT);
     }
 
+    /**
+     * removes from shared preferences the widget with id
+     * @param widgetId the if from the widget to be removed
+     */
     public static void rmWidgetRecipePosition(int widgetId) {
         SharedPreferences sp = MyApp.getContext().getSharedPreferences(Const.PREFS_NAME, MODE_PRIVATE);
         sp.edit().remove(Const.WIDGET_RECIPE_ID + widgetId).apply();
     }
 
+    /**
+     * clears the whole shared preferences memory for the Const.PREFS_NAME
+     */
     public static void clearWidgets() {
         SharedPreferences sp = MyApp.getContext().getSharedPreferences(Const.PREFS_NAME, MODE_PRIVATE);
         sp.edit().clear().apply();

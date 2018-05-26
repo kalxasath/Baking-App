@@ -39,6 +39,13 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
  * Created by gvryn on 26/05/18.
  */
 
+/**
+ * By this test, the app is loaded
+ * the data are fetched from internet
+ * then the first recipe card is clicked
+ * and finally we check if the recipe activity
+ * is started by checking the text of the tv_ingredients_title
+ */
 @RunWith(AndroidJUnit4.class)
 public class MainActivityScreenTest {
 
@@ -52,7 +59,7 @@ public class MainActivityScreenTest {
 
         onView(withId(R.id.rv_recipes)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
 
-        // Checks that the OrderActivity opens with the correct tea name displayed
+        // Checks that the RecipeActivity opens with the correct value in the tv_ingredients_title
         onView(withId(R.id.tv_ingredients_title)).check(matches(withText(INGREDIENTS_TITLE)));
 
     }

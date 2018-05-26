@@ -74,7 +74,6 @@ public class Recipe {
     }
 
     public List<Ingredient> getIngredients() {
-        Log.d(LOG_TAG, "getIngredients count:" + ingredients.size());
         return ingredients; }
 
     public void setIngredients(List<Ingredient> ingredients) { this.ingredients = ingredients; }

@@ -42,6 +42,7 @@ import static com.aiassoft.bakingapp.utilities.PrefUtils.getWidgetRecipePosition
  * Created by gvryn on 25/05/18.
  */
 
+/** This service updates the widgets with the appropriate recipe ingredients */
 public class IngredientsWidgetUpdateService extends Service {
 
     private static final String LOG_TAG = MyApp.APP_TAG + IngredientsWidgetUpdateService.class.getSimpleName();
@@ -56,8 +57,6 @@ public class IngredientsWidgetUpdateService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(LOG_TAG, "onStartCommand");
-
         mAppWidgetManager = AppWidgetManager.getInstance(this);
 
         int[] allWidgetIds = intent
@@ -73,20 +72,16 @@ public class IngredientsWidgetUpdateService extends Service {
             int recipePosition = getWidgetRecipePosition(appWidgetId);
 
             if (! MyApp.hasData() || recipePosition == Const.INVALID_INT) {
-                Log.d(LOG_TAG, "onStartCommand, MyApp.hasData: " + MyApp.hasData() + ", recipePos: " + recipePosition);
-                Log.d(LOG_TAG,"onStartCommand, showDeveloperInfo");
+                // If the app doesn't start because of bug, or developer stop
+                // invalidate widgets since we do not have an app instance with
+                // data from internet
                 showDeveloperInfo(rv);
             } else {
-
-                Log.d(LOG_TAG, "onStartCommand, recipePosition: " + recipePosition);
-                Log.d(LOG_TAG, "onStartCommand, Recipe: " + MyApp.mRecipesData.get(recipePosition).getName());
-                Log.d(LOG_TAG,"onStartCommand, hideDeveloperInfo");
 
                 hideDeveloperInfo(rv);
                 updateRemoteViews(rv, appWidgetId, recipePosition);
             }
 
-            Log.d(LOG_TAG, "onStartCommand, start updateAppWidget");
             mAppWidgetManager.updateAppWidget(appWidgetId, rv);
         }
         stopSelf();

@@ -1,4 +1,6 @@
-/**
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
  * Copyright (C) 2018 by George Vrynios
  * This project was made under the supervision of Udacity
  * in the Android Developer Nanodegree Program
@@ -15,29 +17,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:configure="com.aiassoft.bakingapp.widgets.IngredientsWidgetConfigureActivity"
+    android:initialKeyguardLayout="@layout/ingredients_widget_provider"
+    android:initialLayout="@layout/ingredients_widget_provider"
+    android:minHeight="250dp"
+    android:minWidth="250dp"
+    android:previewImage="@drawable/appwidget_preview"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="86400000"
+    android:widgetCategory="home_screen">
 
-package com.aiassoft.bakingapp.widgets;
-
-import android.content.Intent;
-import android.widget.RemoteViewsService;
-
-import com.aiassoft.bakingapp.MyApp;
-
-/**
- * Created by gvryn on 20/05/18.
- */
-
-/**
- * The listview inside the widget is populated with this service
- * by returning the ListviewRemoteViewsFactory
- */
-public class ListviewRemoteViewsService extends RemoteViewsService {
-
-    private static final String LOG_TAG = MyApp.APP_TAG + ListviewRemoteViewsService.class.getSimpleName();
-
-    @Override
-    public RemoteViewsFactory onGetViewFactory(Intent intent) {
-
-        return new ListviewRemoteViewsFactory(this.getApplicationContext(), intent);
-    }
-}
+</appwidget-provider>
