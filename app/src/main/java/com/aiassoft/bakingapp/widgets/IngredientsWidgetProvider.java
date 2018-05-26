@@ -1,3 +1,21 @@
+/**
+ * Copyright (C) 2018 by George Vrynios
+ * This project was made under the supervision of Udacity
+ * in the Android Developer Nanodegree Program
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.aiassoft.bakingapp.widgets;
 
 import android.appwidget.AppWidgetManager;
@@ -9,6 +27,9 @@ import android.util.Log;
 
 import com.aiassoft.bakingapp.MyApp;
 import com.aiassoft.bakingapp.services.IngredientsWidgetUpdateService;
+
+import static com.aiassoft.bakingapp.utilities.PrefUtils.clearWidgets;
+import static com.aiassoft.bakingapp.utilities.PrefUtils.rmWidgetRecipePosition;
 
 /**
  * Implementation of App Widget functionality.
@@ -177,6 +198,13 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
     }
 
     @Override
+    public void onDeleted (Context context, int[] appWidgetIds) {
+        for (int appWidgetId : appWidgetIds) {
+            rmWidgetRecipePosition(appWidgetId);
+        }
+    }
+
+    @Override
     public void onEnabled(Context context) {
         // Enter relevant functionality for when the first widget is created
 //        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
@@ -188,6 +216,7 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
     @Override
     public void onDisabled(Context context) {
         // Enter relevant functionality for when the last widget is disabled
+        clearWidgets();
     }
 
     public static void sendRefreshBroadcast(Context context) {
