@@ -20,6 +20,10 @@ package com.aiassoft.bakingapp.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
@@ -36,6 +40,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aiassoft.bakingapp.Const;
+import com.aiassoft.bakingapp.IdlingResource.SimpleIdlingResource;
 import com.aiassoft.bakingapp.MyApp;
 import com.aiassoft.bakingapp.R;
 import com.aiassoft.bakingapp.adapters.RecipesListAdapter;
@@ -85,6 +90,21 @@ public class MainActivity extends AppCompatActivity
      * It will be hidden when no data is loading.
      */
     @BindView(R.id.pb_loading_indicator) ProgressBar mLoadingIndicator;
+
+    @Nullable
+    private SimpleIdlingResource mIdlingResource;
+
+    /**
+     * Only called from test, creates and returns a new {@link SimpleIdlingResource}.
+     */
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new SimpleIdlingResource();
+        }
+        return mIdlingResource;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

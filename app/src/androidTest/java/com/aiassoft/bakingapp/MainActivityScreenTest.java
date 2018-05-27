@@ -59,6 +59,7 @@ public class MainActivityScreenTest {
 
         onView(withId(R.id.rv_recipes)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
 
+
         // Checks that the RecipeActivity opens with the correct value in the tv_ingredients_title
         onView(withId(R.id.tv_ingredients_title)).check(matches(withText(INGREDIENTS_TITLE)));
 

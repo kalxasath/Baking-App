@@ -20,6 +20,7 @@
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fl_recipe"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.aiassoft.bakingapp.activities.RecipeActivity"
@@ -33,6 +34,7 @@
         >
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/ll_recipe"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -109,6 +111,7 @@
 
 
             <RelativeLayout
+                android:id="@+id/rl_method_steps"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:descendantFocusability="blocksDescendants">
