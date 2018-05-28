@@ -70,6 +70,7 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
     private static Context mContext;
     private static SimpleExoPlayer mExoPlayer;
     private static long mExoPlayerPosition = 0;
+    private static boolean mExoPlayerState = true;
     private static boolean mInvalidateExoPlayerPosition = false;
 
     private static SimpleExoPlayerView mPlayer;
@@ -92,10 +93,15 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mInvalidateExoPlayerPosition = false;
+        mExoPlayerPosition = 0;
+        mExoPlayerState = true;
+
         /** Load the saved state */
         if (savedInstanceState != null) {
             mRecipeStep = savedInstanceState.getParcelable(Const.STATE_METHODS_STEP);
             mExoPlayerPosition = savedInstanceState.getLong(Const.STATE_EXOPLAYER_POS, 0);
+            mExoPlayerState = savedInstanceState.getBoolean(Const.STATE_EXOPLAYER_STATE, false);
         }
 
         mContext = container.getContext();
@@ -109,7 +115,7 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
 
         /** bind the information to show in the views */
         mRecipeStepInstruction.setText(mRecipeStep.getDescription());
-        displayMedia(mRecipeStep);
+        //displayMedia(mRecipeStep);
 
         /** return the rootView */
         return rootView;
@@ -120,11 +126,14 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
     public void onSaveInstanceState(Bundle outState) {
         Parcelable recipeStepState = mRecipeStep;
 
-        if (mExoPlayer != null)
+        if (mExoPlayer != null) {
             mExoPlayerPosition = mExoPlayer.getCurrentPosition();
+            mExoPlayerState = mExoPlayer.getPlayWhenReady();
+        }
 
         outState.putParcelable(Const.STATE_METHODS_STEP, recipeStepState);
         outState.putLong(Const.STATE_EXOPLAYER_POS, mExoPlayerPosition);
+        outState.putBoolean(Const.STATE_EXOPLAYER_STATE, mExoPlayerState);
 
 
         // call superclass to save any view hierarchy
@@ -134,6 +143,16 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
     @Override
     public void onPause() {
         super.onPause();
+        if (mInvalidateExoPlayerPosition) {
+            mExoPlayerPosition = 0;
+            mExoPlayerState = true;
+            mInvalidateExoPlayerPosition = false;
+        } else if (mExoPlayer != null) {
+            mExoPlayerPosition = mExoPlayer.getCurrentPosition();
+            mExoPlayerState = mExoPlayer.getPlayWhenReady();
+        }
+        releasePlayer();
+        /**
         if (mExoPlayer != null) {
             if (mInvalidateExoPlayerPosition) {
                 mExoPlayerPosition = 0;
@@ -145,26 +164,19 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
         }
         if (mMediaSession != null)
             mMediaSession.setActive(false);
+        */
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        displayMedia(mRecipeStep);
+        /**
         if (mExoPlayer != null)
             mExoPlayer.setPlayWhenReady(true);
         if (mMediaSession != null)
             mMediaSession.setActive(true);
-    }
-
-    /**
-     * Release the player when the fragment is destroyed.
-     */
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        releasePlayer();
-        if (mMediaSession != null)
-            mMediaSession.setActive(false);
+        */
     }
 
     private void displayMedia(Step mStep) {
@@ -176,7 +188,7 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
             mPlayer.setVisibility(View.VISIBLE);
 
             // Initialize the Media Session.
-            initializeMediaSession();
+            //initializeMediaSession();
 
             // Initialize the player.
             initializePlayer(Uri.parse(videoUrl));
@@ -205,35 +217,35 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
      * and media controller.
      */
     private void initializeMediaSession() {
+        if (mMediaSession == null) {
+            // Create a MediaSessionCompat.
+            mMediaSession = new MediaSessionCompat(mContext, LOG_TAG);
 
-        // Create a MediaSessionCompat.
-        mMediaSession = new MediaSessionCompat(mContext, LOG_TAG);
+            // Enable callbacks from MediaButtons and TransportControls.
+            mMediaSession.setFlags(
+                    MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                            MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
-        // Enable callbacks from MediaButtons and TransportControls.
-        mMediaSession.setFlags(
-                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+            // Do not let MediaButtons restart the player when the app is not visible.
+            mMediaSession.setMediaButtonReceiver(null);
 
-        // Do not let MediaButtons restart the player when the app is not visible.
-        mMediaSession.setMediaButtonReceiver(null);
+            // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player.
+            mStateBuilder = new PlaybackStateCompat.Builder()
+                    .setActions(
+                            PlaybackStateCompat.ACTION_PLAY |
+                                    PlaybackStateCompat.ACTION_PAUSE |
+                                    PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                                    PlaybackStateCompat.ACTION_PLAY_PAUSE);
 
-        // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player.
-        mStateBuilder = new PlaybackStateCompat.Builder()
-                .setActions(
-                        PlaybackStateCompat.ACTION_PLAY |
-                                PlaybackStateCompat.ACTION_PAUSE |
-                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
-                                PlaybackStateCompat.ACTION_PLAY_PAUSE);
-
-        mMediaSession.setPlaybackState(mStateBuilder.build());
+            mMediaSession.setPlaybackState(mStateBuilder.build());
 
 
-        // MySessionCallback has methods that handle callbacks from a media controller.
-        mMediaSession.setCallback(new MethodStepFragment.MySessionCallback());
+            // MySessionCallback has methods that handle callbacks from a media controller.
+            mMediaSession.setCallback(new MethodStepFragment.MySessionCallback());
 
-        // Start the Media Session since the activity is active.
-        mMediaSession.setActive(true);
-
+            // Start the Media Session since the activity is active.
+            mMediaSession.setActive(true);
+        }
     }
 
     /**
@@ -242,6 +254,8 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
      */
     private void initializePlayer(Uri mediaUri) {
         if (mExoPlayer == null) {
+            initializeMediaSession();
+
             // Create an instance of the ExoPlayer.
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
@@ -257,7 +271,7 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
                     mContext, userAgent), new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
             playerSeekTo(mExoPlayerPosition);
-            mExoPlayer.setPlayWhenReady(true);
+            mExoPlayer.setPlayWhenReady(mExoPlayerState);
         }
     }
 
@@ -274,6 +288,10 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
             mExoPlayer.stop();
             mExoPlayer.release();
             mExoPlayer = null;
+        }
+        if (mMediaSession != null) {
+            mMediaSession.setActive(false);
+            mMediaSession = null;
         }
     }
 

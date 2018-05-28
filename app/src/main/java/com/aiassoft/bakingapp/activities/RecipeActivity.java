@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -76,6 +77,7 @@ public class RecipeActivity extends AppCompatActivity
     RecyclerView mIngredientsRecyclerView;
 
     /** The Scrool View Container */
+    @Nullable
     @BindView(R.id.sv_recipe) ScrollView mScrollViewContainer;
 
     /** The Method Steps recycler view */
@@ -134,7 +136,7 @@ public class RecipeActivity extends AppCompatActivity
             initializeActivity();
             populateRecipeData();
 
-            if (!MyApp.isTablet && mScrollViewContainerScrollToY != Const.INVALID_INT) {
+            if (!MyApp.isTablet && mScrollViewContainer != null && mScrollViewContainerScrollToY != Const.INVALID_INT) {
                 //this is important. scrollTo doesn't work in main thread.
                 mScrollViewContainer.post(new Runnable()
                 {
@@ -175,7 +177,8 @@ public class RecipeActivity extends AppCompatActivity
 
         outState.putInt(Const.STATE_RECIPE_POS, mRecipePos);
         outState.putInt(Const.STATE_CURRENT_STEP_POSITION, mCurrentStepPosition);
-        outState.putInt(Const.STATE_SCROLL_POS, mScrollViewContainer.getScrollY());
+        if (mScrollViewContainer != null)
+            outState.putInt(Const.STATE_SCROLL_POS, mScrollViewContainer.getScrollY());
 
         Parcelable recyclerState = mMethodStepsRecyclerView.getLayoutManager().onSaveInstanceState();
         outState.putParcelable(Const.STATE_METHODS_STEP_RECYCLER, recyclerState);

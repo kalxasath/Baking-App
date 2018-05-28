@@ -36,8 +36,13 @@ import java.util.Random;
 /**
  * JSON utilities helper class
  */
-public class JsonUtils {
+public final class JsonUtils {
+
     private static final String LOG_TAG = MyApp.APP_TAG + JsonUtils.class.getSimpleName();
+
+    private JsonUtils() {
+        throw new AssertionError("No Instances for you!");
+    }
 
     /**
      *  Dear reviewer kindly I want to inform you that

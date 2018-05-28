@@ -37,8 +37,13 @@ import java.util.Scanner;
 /**
  * These utilities will be used to communicate with the network.
  */
-public class NetworkUtils {
+public final class NetworkUtils {
+
     private static final String LOG_TAG = MyApp.APP_TAG + NetworkUtils.class.getSimpleName();
+
+    private NetworkUtils() {
+        throw new AssertionError("No Instances for you!");
+    }
 
     /**
      * Builds the URL to download the Pictures' data

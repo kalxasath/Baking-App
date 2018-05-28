@@ -30,7 +30,11 @@ import com.aiassoft.bakingapp.MyApp;
  * Created by gvryn on 08/05/18.
  */
 
-public class AppUtils {
+public final class AppUtils {
+
+    private AppUtils() {
+        throw new AssertionError("No Instances for you!");
+    }
 
     public static boolean isTablet() {
         return (MyApp.getContext().getResources().getConfiguration().screenLayout

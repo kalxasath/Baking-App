@@ -22,7 +22,7 @@ package com.aiassoft.bakingapp;
  * Defining a class of constants to use them from any where
  *
  */
-public class Const {
+public final class Const {
     /**
      * We never need to create an instance of the Const class
      * because the Const is simply a class filled,
@@ -70,6 +70,7 @@ public class Const {
     public static final String STATE_RECIPE_POS = "STATE_RECIPE_POS";
     public static final String STATE_STEP_POS = "STATE_STEP_POS";
     public static final String STATE_EXOPLAYER_POS = "STATE_EXOPLAYER_POS";
+    public static final String STATE_EXOPLAYER_STATE = "STATE_EXOPLAYER_STATE";
     public static final String STATE_SCROLL_POS = "STATE_SCROLL_POS";
 
     /**

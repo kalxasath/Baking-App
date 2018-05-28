@@ -90,6 +90,12 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
     private static SimpleExoPlayer mExoPlayer;
     private static long mExoPlayerPosition = 0;
+    private static boolean mExoPlayerState = true;
+
+    /** not the best way but a solution with the existing code
+     * to keep players state when he device is rotated
+     */
+    private static boolean mDirtyKeepExoPlayerState = false;
 
     @BindView(R.id.sepv_player) SimpleExoPlayerView mPlayer;
     @BindView(R.id.iv_image) ImageView mThumbnail;
@@ -121,12 +127,15 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
         setContentView(R.layout.activity_step);
         ButterKnife.bind(this);
 
+        mDirtyKeepExoPlayerState = false;
         // recovering the instance state
         if (savedInstanceState != null) {
 
             mRecipePos = savedInstanceState.getInt(Const.STATE_RECIPE_POS, Const.INVALID_INT);
             mStepPos = savedInstanceState.getInt(Const.STATE_STEP_POS, Const.INVALID_INT);
             mExoPlayerPosition = savedInstanceState.getLong(Const.STATE_EXOPLAYER_POS, 0);
+            mExoPlayerState = savedInstanceState.getBoolean(Const.STATE_EXOPLAYER_STATE, false);
+            mDirtyKeepExoPlayerState = true;
 
         } else {
             /** should be called from another activity. if not, show error toast and return */
@@ -176,12 +185,15 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
         if (mSlideViewPager != null)
             mStepPos = mSlideViewPager.getCurrentItem();
-        if (mExoPlayer != null)
+        if (mExoPlayer != null) {
             mExoPlayerPosition = mExoPlayer.getCurrentPosition();
+            mExoPlayerState = mExoPlayer.getPlayWhenReady();
+        }
 
         outState.putInt(Const.STATE_RECIPE_POS, mRecipePos);
         outState.putInt(Const.STATE_STEP_POS, mStepPos);
         outState.putLong(Const.STATE_EXOPLAYER_POS, mExoPlayerPosition);
+        outState.putBoolean(Const.STATE_EXOPLAYER_STATE, mExoPlayerState);
 
         // call superclass to save any view hierarchy
         //super.onSaveInstanceState(outState);
@@ -198,13 +210,13 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
         setTitle(mRecipe.getName());
 
-        initializeMediaSession();
+        //initializeMediaSession();
 
         if (inLandscape()) {
 
             hideSystemUI(this);
 
-            displayMedia(mSteps.get(mStepPos));
+            //displayMedia(mSteps.get(mStepPos));
 
         } else {
 
@@ -227,7 +239,7 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
             mSlideViewPager.setCurrentItem(mStepPos);
 
-            setPageIndicator(mSteps.size(), mStepPos);
+//            setPageIndicator(mSteps.size(), mStepPos);
 
             mBtnPrev.setOnClickListener(this);
             mBtnNext.setOnClickListener(this);
@@ -243,7 +255,7 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
             mPlayer.setVisibility(View.VISIBLE);
 
             // Initialize the Media Session.
-            initializeMediaSession();
+            //initializeMediaSession();
 
             // Initialize the player.
             initializePlayer(Uri.parse(videoUrl));
@@ -282,8 +294,6 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     }
 
     private void setPageIndicator(int pages, int page) {
-        releasePlayer();
-
         mDots[mPrevPage].setTextColor(getResources().getColor(R.color.colorStepIndicator));
         mDots[page].setTextColor(getResources().getColor(R.color.colorStepIndicatorCurrent));
         mPrevPage = page;
@@ -302,12 +312,18 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
             mBtnNext.setText(getResources().getString(R.string.next));
             mBtnPrev.setText(getResources().getString(R.string.prev));
         }
-
-        displayMedia(mSteps.get(page));
     }
 
     private void initializePage(int page) {
+        releasePlayer();
         setPageIndicator(mSteps.size(), page);
+
+        if (mDirtyKeepExoPlayerState) {
+            mDirtyKeepExoPlayerState = false;
+        } else
+            mExoPlayerState = true;
+
+        displayMedia(mSteps.get(page));
     }
 
     ViewPager.OnPageChangeListener viewPagerOnPageChangeListener = new ViewPager.OnPageChangeListener() {
@@ -334,35 +350,35 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
      * and media controller.
      */
     private void initializeMediaSession() {
+        if (mMediaSession == null) {
+            // Create a MediaSessionCompat.
+            mMediaSession = new MediaSessionCompat(this, LOG_TAG);
 
-        // Create a MediaSessionCompat.
-        mMediaSession = new MediaSessionCompat(this, LOG_TAG);
+            // Enable callbacks from MediaButtons and TransportControls.
+            mMediaSession.setFlags(
+                    MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                            MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
-        // Enable callbacks from MediaButtons and TransportControls.
-        mMediaSession.setFlags(
-                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+            // Do not let MediaButtons restart the player when the app is not visible.
+            mMediaSession.setMediaButtonReceiver(null);
 
-        // Do not let MediaButtons restart the player when the app is not visible.
-        mMediaSession.setMediaButtonReceiver(null);
+            // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player.
+            mStateBuilder = new PlaybackStateCompat.Builder()
+                    .setActions(
+                            PlaybackStateCompat.ACTION_PLAY |
+                                    PlaybackStateCompat.ACTION_PAUSE |
+                                    PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                                    PlaybackStateCompat.ACTION_PLAY_PAUSE);
 
-        // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player.
-        mStateBuilder = new PlaybackStateCompat.Builder()
-                .setActions(
-                        PlaybackStateCompat.ACTION_PLAY |
-                                PlaybackStateCompat.ACTION_PAUSE |
-                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
-                                PlaybackStateCompat.ACTION_PLAY_PAUSE);
-
-        mMediaSession.setPlaybackState(mStateBuilder.build());
+            mMediaSession.setPlaybackState(mStateBuilder.build());
 
 
-        // MySessionCallback has methods that handle callbacks from a media controller.
-        mMediaSession.setCallback(new MySessionCallback());
+            // MySessionCallback has methods that handle callbacks from a media controller.
+            mMediaSession.setCallback(new MySessionCallback());
 
-        // Start the Media Session since the activity is active.
-        mMediaSession.setActive(true);
-
+            // Start the Media Session since the activity is active.
+            mMediaSession.setActive(true);
+        }
     }
 
 
@@ -373,6 +389,8 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
      */
     private void initializePlayer(Uri mediaUri) {
         if (mExoPlayer == null) {
+            initializeMediaSession();
+
             // Create an instance of the ExoPlayer.
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
@@ -388,7 +406,7 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
                     this, userAgent), new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
             playerSeekTo(mExoPlayerPosition);
-            mExoPlayer.setPlayWhenReady(true);
+            mExoPlayer.setPlayWhenReady(mExoPlayerState);
         }
     }
 
@@ -405,6 +423,10 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
             mExoPlayer.stop();
             mExoPlayer.release();
             mExoPlayer = null;
+        }
+        if (mMediaSession != null) {
+            mMediaSession.setActive(false);
+            mMediaSession = null;
         }
     }
 
@@ -441,31 +463,28 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
         super.onPause();
         if (mExoPlayer != null) {
             mExoPlayerPosition = mExoPlayer.getCurrentPosition();
+            mExoPlayerState = mExoPlayer.getPlayWhenReady();
             mExoPlayer.setPlayWhenReady(false);
         }
+        /**
         if (mMediaSession != null)
             mMediaSession.setActive(false);
+        */
+        releasePlayer();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        displayMedia(mSteps.get(mStepPos));
+        /*
         if (mExoPlayer != null)
             mExoPlayer.setPlayWhenReady(true);
         if (mMediaSession != null)
             mMediaSession.setActive(true);
+        */
     }
 
-    /**
-     * Release the player when the activity is destroyed.
-     */
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        releasePlayer();
-        if (mMediaSession != null)
-            mMediaSession.setActive(false);
-    }
 
     /** ExoPlayer Event Listeners */
 

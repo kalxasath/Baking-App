@@ -31,7 +31,12 @@ import com.aiassoft.bakingapp.R;
  * These utilities will be used to play youtube videos.
  */
 public final class YoutubeUtils {
+
     private static final String LOG_TAG = MyApp.APP_TAG + YoutubeUtils.class.getSimpleName();
+
+    private YoutubeUtils() {
+        throw new AssertionError("No Instances for you!");
+    }
 
     /**
      * Builds the URL to watch the Youtube video

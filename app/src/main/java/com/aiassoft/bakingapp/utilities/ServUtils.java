@@ -29,7 +29,11 @@ import static com.aiassoft.bakingapp.utilities.IntentUtils.convertImplicitIntent
  * Created by gvryn on 25/05/18.
  */
 
-public class ServUtils {
+public final class ServUtils {
+
+    private ServUtils() {
+        throw new AssertionError("No Instances for you!");
+    }
 
     public static void startService(String intentUri) {
         Intent implicitIntent = new Intent();

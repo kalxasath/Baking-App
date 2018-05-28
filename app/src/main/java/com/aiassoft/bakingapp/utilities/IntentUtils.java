@@ -30,7 +30,11 @@ import java.util.List;
  * Created by gvryn on 25/05/18.
  */
 
-public class IntentUtils {
+public final class IntentUtils {
+
+    private IntentUtils() {
+        throw new AssertionError("No Instances for you!");
+    }
 
     public static Intent convertImplicitIntentToExplicitIntent(Context context, Intent implicitIntent) {
         // Retrieve all services that can match the given intent

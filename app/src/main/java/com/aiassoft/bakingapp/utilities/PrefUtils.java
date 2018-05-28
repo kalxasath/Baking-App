@@ -32,10 +32,12 @@ import static android.content.Context.MODE_PRIVATE;
 /** for each widget save the recipe position, so we can populate the ingredients
  * with out to have to ask the user every time
  */
-public class PrefUtils {
+public final class PrefUtils {
     private static final String LOG_TAG = MyApp.APP_TAG + PrefUtils.class.getSimpleName();
 
-    private PrefUtils() {}
+    private PrefUtils() {
+        throw new AssertionError("No Instances for you!");
+    }
 
     /**
      * Save the recipe position to the widget
