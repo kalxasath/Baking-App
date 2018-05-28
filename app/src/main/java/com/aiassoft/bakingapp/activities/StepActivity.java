@@ -18,7 +18,6 @@
 
 package com.aiassoft.bakingapp.activities;
 
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -89,7 +88,9 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     private static int mRecipePos = Const.INVALID_INT;
     private static int mStepPos = Const.INVALID_INT;
 
-    private SimpleExoPlayer mExoPlayer;
+    private static SimpleExoPlayer mExoPlayer;
+    private static long mExoPlayerPosition = 0;
+
     @BindView(R.id.sepv_player) SimpleExoPlayerView mPlayer;
     @BindView(R.id.iv_image) ImageView mThumbnail;
     ViewPager mSlideViewPager;
@@ -99,7 +100,6 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
     private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
-    private NotificationManager mNotificationManager;
 
     private SliderAdapter mSliderAdapter;
     private TextView[] mDots;
@@ -126,6 +126,7 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
             mRecipePos = savedInstanceState.getInt(Const.STATE_RECIPE_POS, Const.INVALID_INT);
             mStepPos = savedInstanceState.getInt(Const.STATE_STEP_POS, Const.INVALID_INT);
+            mExoPlayerPosition = savedInstanceState.getLong(Const.STATE_EXOPLAYER_POS, 0);
 
         } else {
             /** should be called from another activity. if not, show error toast and return */
@@ -167,12 +168,24 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     /** invoked when the activity may be temporarily destroyed, save the instance state here */
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Log.d(LOG_TAG, " :: onSaveInstanceState");
+        super.onSaveInstanceState(outState);
+
+        //Log.d(LOG_TAG, " :: onSaveInstanceState, mRecipePos: " + mRecipePos +
+        //        ", mStepPos: " + mStepPos + ", mSlideViewPager.getCurrentItem: " + mSlideViewPager.getCurrentItem() +
+        //        ", mExoPlayerPosition: " + mExoPlayerPosition + ", getCurrentPosition: " + mExoPlayer.getCurrentPosition());
+
+        if (mSlideViewPager != null)
+            mStepPos = mSlideViewPager.getCurrentItem();
+        if (mExoPlayer != null)
+            mExoPlayerPosition = mExoPlayer.getCurrentPosition();
+
         outState.putInt(Const.STATE_RECIPE_POS, mRecipePos);
         outState.putInt(Const.STATE_STEP_POS, mStepPos);
+        outState.putLong(Const.STATE_EXOPLAYER_POS, mExoPlayerPosition);
 
         // call superclass to save any view hierarchy
-        super.onSaveInstanceState(outState);
+        //super.onSaveInstanceState(outState);
+        Log.d(LOG_TAG, "info");
     }
 
     private void initializeActivity() {
@@ -269,6 +282,8 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
     }
 
     private void setPageIndicator(int pages, int page) {
+        releasePlayer();
+
         mDots[mPrevPage].setTextColor(getResources().getColor(R.color.colorStepIndicator));
         mDots[page].setTextColor(getResources().getColor(R.color.colorStepIndicatorCurrent));
         mPrevPage = page;
@@ -288,7 +303,6 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
             mBtnPrev.setText(getResources().getString(R.string.prev));
         }
 
-        releasePlayer();
         displayMedia(mSteps.get(page));
     }
 
@@ -373,8 +387,14 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     this, userAgent), new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
+            playerSeekTo(mExoPlayerPosition);
             mExoPlayer.setPlayWhenReady(true);
         }
+    }
+
+    private void playerSeekTo(long seekToPosition) {
+        mExoPlayerPosition = seekToPosition;
+        mExoPlayer.seekTo(seekToPosition);
     }
 
     /**
@@ -416,6 +436,25 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
         return true;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mExoPlayer != null) {
+            mExoPlayerPosition = mExoPlayer.getCurrentPosition();
+            mExoPlayer.setPlayWhenReady(false);
+        }
+        if (mMediaSession != null)
+            mMediaSession.setActive(false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mExoPlayer != null)
+            mExoPlayer.setPlayWhenReady(true);
+        if (mMediaSession != null)
+            mMediaSession.setActive(true);
+    }
 
     /**
      * Release the player when the activity is destroyed.
@@ -457,6 +496,8 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
         } else if((playbackState == ExoPlayer.STATE_READY)){
             mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
                     mExoPlayer.getCurrentPosition(), 1f);
+        } else if (playbackState == PlaybackStateCompat.STATE_PLAYING) {
+            mExoPlayerPosition = mExoPlayer.getCurrentPosition();
         }
         mMediaSession.setPlaybackState(mStateBuilder.build());
     }
@@ -475,13 +516,16 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
         switch (id) {
             case R.id.bt_prev:
+                mExoPlayerPosition = 0;
                 mSlideViewPager.setCurrentItem(mSlideViewPager.getCurrentItem()-1);
                 break;
             case R.id.bt_next:
+                mExoPlayerPosition = 0;
                 mSlideViewPager.setCurrentItem(mSlideViewPager.getCurrentItem()+1);
                 break;
         }
     }
+
 
     /**
      * Media Session Callbacks, where all external clients control the player.
@@ -499,7 +543,8 @@ public class StepActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
         @Override
         public void onSkipToPrevious() {
-            mExoPlayer.seekTo(0);
+            playerSeekTo(0);
+            mExoPlayer.setPlayWhenReady(false);
         }
     }
 

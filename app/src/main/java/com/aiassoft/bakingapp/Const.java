@@ -69,6 +69,8 @@ public class Const {
      */
     public static final String STATE_RECIPE_POS = "STATE_RECIPE_POS";
     public static final String STATE_STEP_POS = "STATE_STEP_POS";
+    public static final String STATE_EXOPLAYER_POS = "STATE_EXOPLAYER_POS";
+    public static final String STATE_SCROLL_POS = "STATE_SCROLL_POS";
 
     /**
      * Identifies the save instance parameter of the recipe pos on the recycler view

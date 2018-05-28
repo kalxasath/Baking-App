@@ -69,6 +69,9 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
 
     private static Context mContext;
     private static SimpleExoPlayer mExoPlayer;
+    private static long mExoPlayerPosition = 0;
+    private static boolean mInvalidateExoPlayerPosition = false;
+
     private static SimpleExoPlayerView mPlayer;
     private static ImageView mThumbnail;
     private static TextView mRecipeStepInstruction;
@@ -92,6 +95,7 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
         /** Load the saved state */
         if (savedInstanceState != null) {
             mRecipeStep = savedInstanceState.getParcelable(Const.STATE_METHODS_STEP);
+            mExoPlayerPosition = savedInstanceState.getLong(Const.STATE_EXOPLAYER_POS, 0);
         }
 
         mContext = container.getContext();
@@ -115,11 +119,41 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
     @Override
     public void onSaveInstanceState(Bundle outState) {
         Parcelable recipeStepState = mRecipeStep;
+
+        if (mExoPlayer != null)
+            mExoPlayerPosition = mExoPlayer.getCurrentPosition();
+
         outState.putParcelable(Const.STATE_METHODS_STEP, recipeStepState);
+        outState.putLong(Const.STATE_EXOPLAYER_POS, mExoPlayerPosition);
 
 
         // call superclass to save any view hierarchy
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mExoPlayer != null) {
+            if (mInvalidateExoPlayerPosition) {
+                mExoPlayerPosition = 0;
+                mInvalidateExoPlayerPosition = false;
+            } else
+                mExoPlayerPosition = mExoPlayer.getCurrentPosition();
+
+            mExoPlayer.setPlayWhenReady(false);
+        }
+        if (mMediaSession != null)
+            mMediaSession.setActive(false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mExoPlayer != null)
+            mExoPlayer.setPlayWhenReady(true);
+        if (mMediaSession != null)
+            mMediaSession.setActive(true);
     }
 
     /**
@@ -222,8 +256,14 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     mContext, userAgent), new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
+            playerSeekTo(mExoPlayerPosition);
             mExoPlayer.setPlayWhenReady(true);
         }
+    }
+
+    private void playerSeekTo(long seekToPosition) {
+        mExoPlayerPosition = seekToPosition;
+        mExoPlayer.seekTo(seekToPosition);
     }
 
     /**
@@ -238,7 +278,9 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
     }
 
     public void setRecipeStep(Step recipeStep) {
-        this.mRecipeStep = recipeStep;
+        mRecipeStep = recipeStep;
+        // OnPause should invalidate the current player position
+        mInvalidateExoPlayerPosition = true;
     }
 
     @Override
@@ -264,6 +306,8 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
         } else if((playbackState == ExoPlayer.STATE_READY)){
             mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
                     mExoPlayer.getCurrentPosition(), 1f);
+        } else if (playbackState == PlaybackStateCompat.STATE_PLAYING) {
+            mExoPlayerPosition = mExoPlayer.getCurrentPosition();
         }
         mMediaSession.setPlaybackState(mStateBuilder.build());
     }
@@ -294,7 +338,8 @@ public class MethodStepFragment extends Fragment implements ExoPlayer.EventListe
 
         @Override
         public void onSkipToPrevious() {
-            mExoPlayer.seekTo(0);
+            playerSeekTo(0);
+            mExoPlayer.setPlayWhenReady(false);
         }
     }
 

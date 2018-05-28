@@ -35,6 +35,8 @@ import static android.content.Context.MODE_PRIVATE;
 public class PrefUtils {
     private static final String LOG_TAG = MyApp.APP_TAG + PrefUtils.class.getSimpleName();
 
+    private PrefUtils() {}
+
     /**
      * Save the recipe position to the widget
      * @param widgetId the widget id

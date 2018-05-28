@@ -43,7 +43,6 @@ public class IntentTests {
     @Before
     public void registerIdlingResource() {
         mIdlingResource = mActivityTestRule.getActivity().getIdlingResource();
-        // To prove that the test fails, omit this call:
         Espresso.registerIdlingResources(mIdlingResource);
     }
 

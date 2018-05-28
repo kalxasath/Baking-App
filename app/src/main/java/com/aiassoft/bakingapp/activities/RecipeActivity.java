@@ -29,6 +29,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,6 +63,7 @@ public class RecipeActivity extends AppCompatActivity
     private int mRecipePos = Const.INVALID_INT;
 
     private int mCurrentStepPosition = Const.INVALID_INT;
+    private int mScrollViewContainerScrollToY = Const.INVALID_INT;
 
     /** The Ingredients List Adapter */
     private IngredientsListAdapter mIngredientsListAdapter;
@@ -72,6 +74,9 @@ public class RecipeActivity extends AppCompatActivity
     /** The views in the xml file */
     /** The Ingredients recycler view */
     RecyclerView mIngredientsRecyclerView;
+
+    /** The Scrool View Container */
+    @BindView(R.id.sv_recipe) ScrollView mScrollViewContainer;
 
     /** The Method Steps recycler view */
     @BindView(R.id.rv_method_steps) RecyclerView mMethodStepsRecyclerView;
@@ -103,6 +108,7 @@ public class RecipeActivity extends AppCompatActivity
         if (savedInstanceState != null) {
             mRecipePos = savedInstanceState.getInt(Const.STATE_RECIPE_POS, Const.INVALID_INT);
             mCurrentStepPosition = savedInstanceState.getInt(Const.STATE_CURRENT_STEP_POSITION, Const.INVALID_INT);
+            mScrollViewContainerScrollToY = savedInstanceState.getInt(Const.STATE_SCROLL_POS, Const.INVALID_INT);
 
             recyclerState = savedInstanceState.getParcelable(Const.STATE_METHODS_STEP_RECYCLER);
         } else {
@@ -127,6 +133,18 @@ public class RecipeActivity extends AppCompatActivity
 
             initializeActivity();
             populateRecipeData();
+
+            if (!MyApp.isTablet && mScrollViewContainerScrollToY != Const.INVALID_INT) {
+                //this is important. scrollTo doesn't work in main thread.
+                mScrollViewContainer.post(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        mScrollViewContainer.scrollTo(0, mScrollViewContainerScrollToY);
+                    }
+                });
+            }
 
             if (recyclerState != null)
                 mMethodStepsRecyclerView.getLayoutManager().onRestoreInstanceState(recyclerState);
@@ -153,9 +171,11 @@ public class RecipeActivity extends AppCompatActivity
     /** invoked when the activity may be temporarily destroyed, save the instance state here */
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Log.d(LOG_TAG, " :: onSaveInstanceState");
+        //Log.d(LOG_TAG, " :: onSaveInstanceState");
+
         outState.putInt(Const.STATE_RECIPE_POS, mRecipePos);
         outState.putInt(Const.STATE_CURRENT_STEP_POSITION, mCurrentStepPosition);
+        outState.putInt(Const.STATE_SCROLL_POS, mScrollViewContainer.getScrollY());
 
         Parcelable recyclerState = mMethodStepsRecyclerView.getLayoutManager().onSaveInstanceState();
         outState.putParcelable(Const.STATE_METHODS_STEP_RECYCLER, recyclerState);
@@ -291,7 +311,7 @@ public class RecipeActivity extends AppCompatActivity
     @Override
     public void onClick(int stepPosition) {
         if (MyApp.isTablet) {
-            Toast.makeText(this, "Step: " + stepPosition, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Step: " + stepPosition, Toast.LENGTH_SHORT).show();
             displayMethodStep(stepPosition);
 
         } else {
@@ -315,7 +335,7 @@ public class RecipeActivity extends AppCompatActivity
 
     @Override
     public void onClick(View v) {
-        Toast.makeText(this, "Click from: " + v.getTag().toString(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Click from: " + v.getTag().toString(), Toast.LENGTH_SHORT).show();
 
         if (v.getId() == R.id.tv_ingredients_title) {
             mMethodStepsListAdapter.invalidateSelectedView();

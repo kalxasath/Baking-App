@@ -30,7 +30,7 @@ import com.aiassoft.bakingapp.R;
 /**
  * These utilities will be used to play youtube videos.
  */
-public class YoutubeUtils {
+public final class YoutubeUtils {
     private static final String LOG_TAG = MyApp.APP_TAG + YoutubeUtils.class.getSimpleName();
 
     /**
