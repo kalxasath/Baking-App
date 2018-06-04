@@ -7,6 +7,9 @@
 
 # Baking App
 
+<h1 align=center>
+<img src="assets/horizontal.png" width=70%>
+</h1>
 
 ## Project Overview
 
@@ -39,3 +42,7 @@ One of the skills you will demonstrate in this project is how to handle unexpect
 ## April 19, 2018 - Initial Commit
 
 > Written with [StackEdit](https://stackedit.io/).
+
+## June 04, 2018 - Initial Commit
+
+> Added logo and icons by [zularizal](https://github.com/zularizal)
